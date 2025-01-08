@@ -1,1 +1,7 @@
 awpy==2.0.0b4
+asgiref==3.8.1
+Django==5.1.4
+djangorestframework==3.15.2
+sqlparse==0.5.3
+tzdata==2024.2
+django-cors-headers==4.6.0
