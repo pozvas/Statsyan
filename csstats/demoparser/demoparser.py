@@ -19,26 +19,38 @@ def _merge_many(list: list[pd.DataFrame], how='inner', on=None) -> pd.DataFrame:
 
 def get_start_info(parser: DemoParser) -> pd.DataFrame:
     df = parser.parse_event('begin_new_match')
-    return parser.parse_ticks(['team_name'], ticks=df['tick'])
+    team_name = parser.parse_ticks(['team_name'], ticks=df['tick'])
+    team_name['steamid'] = team_name['steamid'].astype(str)
+    team_name['global_team_name'] = team_name.apply(lambda row: 'Team 1' if row['team_name'] == 'CT' else 'Team 2', axis=1)
+    return team_name
 
 
-def get_kd(demo: Demo) -> pd.DataFrame:
+def get_kd(parser: DemoParser) -> pd.DataFrame:
+    deaths = parser.parse_event("player_death")
+    filter_deaths = deaths[deaths['attacker_name'].notna()]
+    ticks = parser.parse_ticks(["team_name"], ticks=deaths["tick"].to_list())
+
+    def get_team_name(row, ticks, steamid_column):
+        return ticks[(ticks['tick'] == row['tick']) & (ticks['steamid'] == int(row[steamid_column]))]['team_name'].iloc[0]
+
+    filter_deaths['attacker_team_name'] = filter_deaths.apply(lambda row: get_team_name(row, ticks, 'attacker_steamid'), axis=1)
+    filter_deaths['assister_team_name'] = filter_deaths[filter_deaths['assister_steamid'].notna()].apply(lambda row: get_team_name(row, ticks, 'assister_steamid'), axis=1)
+    filter_deaths['user_team_name'] = filter_deaths.apply(lambda row: get_team_name(row, ticks, 'user_steamid'), axis=1)
 
     columns = {
         'kills': 'attacker',
         'assists': 'assister',
-        'deaths': 'victim'
+        'deaths': 'user'
     }
     result = None
 
     for column_name, prefix in columns.items():
-        df = demo.kills.rename(columns={
+        df = filter_deaths.rename(columns={
             f'{prefix}_steamid': 'steamid',
             f'{prefix}_team_name': 'team_name',
-            f'{prefix}_name': 'name',
         })
-        data_sides = df.groupby(['steamid', 'team_name', 'name',]).size().reset_index(name=column_name)
-        data_all = df.groupby(['steamid', 'name',]).size().reset_index(name=column_name)
+        data_sides = df.groupby(['steamid', 'team_name',]).size().reset_index(name=column_name)
+        data_all = df.groupby(['steamid',]).size().reset_index(name=column_name)
         data_all['team_name'] = 'all'
 
         combined_data = pd.concat([data_all, data_sides], ignore_index=True)
@@ -46,7 +58,7 @@ def get_kd(demo: Demo) -> pd.DataFrame:
         if result is None:
             result = combined_data
         else:
-            result = result.merge(combined_data, on=['steamid', 'team_name', 'name'], how='outer')
+            result = result.merge(combined_data, on=['steamid', 'team_name'], how='outer')
 
     return result.fillna(0)
 
@@ -145,11 +157,11 @@ def get_firt_kills_count(parser: DemoParser) -> pd.DataFrame:
     first_deaths_count['team_name'] = 'all'
 
     # Sides
-    first_kills_count_sides = first_kills.groupby(['attacker_steamid', 'attacker_team_name']).size().reset_index(name='fk').rename(columns={
+    first_kills_count_sides = first_kills.groupby(['attacker_steamid', 'attacker_team_name']).size().reset_index(name='first_kills').rename(columns={
         'attacker_steamid': 'steamid',
         'attacker_team_name': 'team_name'
     })
-    first_deaths_count_sides = first_kills.groupby(['victim_steamid', 'victim_team_name']).size().reset_index(name='fd').rename(columns={
+    first_deaths_count_sides = first_kills.groupby(['victim_steamid', 'victim_team_name']).size().reset_index(name='first_deaths').rename(columns={
         'victim_steamid': 'steamid',
         'victim_team_name': 'team_name'
     })
@@ -203,26 +215,22 @@ def get_flash_assists(parser: DemoParser) -> pd.DataFrame:
         'assister_steamid': 'steamid'
     })
 
-#csstats\files\natus-vincere-vs-imperial-nuke.dem
-#parser = DemoParser(r'C:\Projects\Python\сsstats\csstats\csstats\files\spirit-vs-faze-m2-ancient.dem')
 
-#d = parser.parse_ticks(['flash_duration', 'flash_max_alpha'])
-#f = parser.parse_grenades()
-#print(f[f['tick'] == 16511])
-#print(d[d['flash_duration'] != 0])
+# csstats\files\natus-vincere-vs-imperial-nuke.dem
+parser = DemoParser(r'C:\Projects\Python\сsstats\csstats\csstats\files\spirit-vs-faze-m2-ancient.dem')
 
 
 def get_stats(path: str):
     """das."""
     demo = Demo(path)
     scoreboard = []
-    result = stats.adr(demo, team_dmg=True)
+    scoreboard.append(stats.adr(demo, team_dmg=True))
     scoreboard.append(stats.kast(demo))
     scoreboard.append(stats.rating(demo))
     scoreboard.append(stats.impact(demo))
-    scoreboard.append(get_kd(demo))
 
     parser = DemoParser(path)
+    scoreboard.append(get_kd(parser))
     scoreboard.append(get_clutches(parser))
     scoreboard.append(get_firt_kills_count(parser))
     scoreboard.append(get_enemy_flashed(parser))
@@ -230,7 +238,6 @@ def get_stats(path: str):
     scoreboard.append(get_flash_assists(parser))
 
     result = _merge_many(scoreboard, how='left').fillna(0)
-    print(result)
+    result = result.merge(get_start_info(parser)[['steamid', 'global_team_name']], how='left', on=['steamid'])
 
     return result.to_json(orient='records')
-
