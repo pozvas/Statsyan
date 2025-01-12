@@ -18,7 +18,7 @@ def _merge_many(list: list[pd.DataFrame], how='inner', on=None) -> pd.DataFrame:
 
 
 def get_start_info(parser: DemoParser) -> pd.DataFrame:
-    df = parser.parse_event('begin_new_match')
+    df = parser.parse_event('round_announce_match_start')
     team_name = parser.parse_ticks(['team_name'], ticks=df['tick'])
     team_name['steamid'] = team_name['steamid'].astype(str)
     team_name['global_team_name'] = team_name.apply(lambda row: 'Team 1' if row['team_name'] == 'CT' else 'Team 2', axis=1)
@@ -217,8 +217,8 @@ def get_flash_assists(parser: DemoParser) -> pd.DataFrame:
 
 
 # csstats\files\natus-vincere-vs-imperial-nuke.dem
-parser = DemoParser(r'C:\Projects\Python\сsstats\csstats\csstats\files\spirit-vs-faze-m2-ancient.dem')
-
+parser = DemoParser(r'C:\Projects\Python\diplom\csstats_backend\csstats\files\natus-vincere-vs-imperial-nuke.dem')
+#print(parser.parse_event('round_announce_match_start'))
 
 def get_stats(path: str):
     """das."""
@@ -240,4 +240,7 @@ def get_stats(path: str):
     result = _merge_many(scoreboard, how='left').fillna(0)
     result = result.merge(get_start_info(parser)[['steamid', 'global_team_name']], how='left', on=['steamid'])
 
-    return result.to_json(orient='records')
+    return result
+
+
+#print(get_stats(r'C:\Projects\Python\diplom\csstats_backend\csstats\files\natus-vincere-vs-imperial-nuke.dem').columns)
