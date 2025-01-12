@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'rest_framework',
-    'analyzer.apps.AnalyzerConfig'
+    'analyzer.apps.AnalyzerConfig',
+    'demo_database.apps.DemoDatabaseConfig',
 ]
 
 MIDDLEWARE = [
