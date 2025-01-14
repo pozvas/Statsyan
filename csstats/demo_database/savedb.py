@@ -9,7 +9,7 @@ def save_stats(df: DataFrame):
         player, created = Player.objects.get_or_create(steamid=row['steamid'])
 
         scoreboard = ScoreBoard(
-            player=player,
+            steamid=player,
             demo=demo,
             side=row['team_name'],
             team=row['global_team_name'],
@@ -32,3 +32,5 @@ def save_stats(df: DataFrame):
             flash_assists=row['flash_assists']
         )
         scoreboard.save()
+    
+    return demo.pk
