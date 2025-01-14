@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from demoparser.demoparser import get_stats
 from demo_database.savedb import save_stats
+from steam.steamapi import get_players_names_and_avatars
 from demo_database.models import ScoreBoard, Demo, Player
 from demo_database.serializers import ScoreBoardSerializer, PlayersMatchesSerializer
 import json
@@ -22,8 +23,8 @@ class DemoFileUploadView(APIView):
         try:
             # Обрабатываем файл
             data = get_stats(temp_file_path)
-            save_stats(data)
-            return Response(json.loads(data.to_json(orient='records')), status=status.HTTP_200_OK)
+            demo_id = save_stats(data)
+            return Response({'demo_id': demo_id}, status=status.HTTP_200_OK)
         finally:
             # Удаляем временный файл
             os.remove(temp_file_path)
@@ -34,7 +35,9 @@ class ScoreBoardDetailView(APIView):
         try:
             demo = Demo.objects.get(id=demo_id)
             scoreboards = ScoreBoard.objects.filter(demo=demo)
-            serializer = ScoreBoardSerializer(scoreboards, many=True)
+            steamids = scoreboards.values_list('steamid', flat=True).distinct()
+            players_data = get_players_names_and_avatars(steamids)
+            serializer = ScoreBoardSerializer(scoreboards, many=True, context={'players_data': players_data})
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Demo.DoesNotExist:
             return Response({"error": "Demo not found"}, status=status.HTTP_404_NOT_FOUND)
@@ -44,8 +47,9 @@ class PlayerMatchesView(APIView):
     def get(self, request, steamid):
         try:
             player = Player.objects.get(steamid=steamid)
-            scoreboards = ScoreBoard.objects.filter(player=player, side='all')
+            scoreboards = ScoreBoard.objects.filter(steamid=player, side='all')
             serializer = PlayersMatchesSerializer(scoreboards, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Player.DoesNotExist:
             return Response({"error": "Player not found"}, status=status.HTTP_404_NOT_FOUND)
+        

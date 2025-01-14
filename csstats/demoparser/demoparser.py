@@ -217,7 +217,11 @@ def get_flash_assists(parser: DemoParser) -> pd.DataFrame:
 
 
 # csstats\files\natus-vincere-vs-imperial-nuke.dem
-parser = DemoParser(r'C:\Projects\Python\diplom\csstats_backend\csstats\files\natus-vincere-vs-imperial-nuke.dem')
+parser = DemoParser(r'C:\Projects\Python\diplom\csstats_backend\csstats\files\spirit-vs-faze-m1-nuke.dem')
+parser2 = DemoParser(r'C:\Projects\Python\diplom\csstats_backend\csstats\files\match730_003729204860554314148_1540754158_187.dem')
+
+print(parser2.parse_header())
+
 #print(parser.parse_event('round_announce_match_start'))
 
 def get_stats(path: str):
@@ -244,3 +248,4 @@ def get_stats(path: str):
 
 
 #print(get_stats(r'C:\Projects\Python\diplom\csstats_backend\csstats\files\natus-vincere-vs-imperial-nuke.dem').columns)
+

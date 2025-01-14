@@ -2,7 +2,7 @@ from django.db import models
 
 
 class Player(models.Model):
-    steamid = models.PositiveBigIntegerField(primary_key=True)
+    steamid = models.CharField(primary_key=True, max_length=20)
     auth_code = models.CharField(max_length=50, null=True, blank=True)
 
 
@@ -12,7 +12,7 @@ class Demo(models.Model):
 
 
 class ScoreBoard(models.Model):
-    player = models.ForeignKey(Player, on_delete=models.DO_NOTHING)
+    steamid = models.ForeignKey(Player, on_delete=models.DO_NOTHING)
     demo = models.ForeignKey(Demo, on_delete=models.DO_NOTHING)
 
     side = models.CharField(max_length=10)
