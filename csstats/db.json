@@ -1,0 +1,894 @@
+[
+    {
+        "model": "demo_database.Side",
+        "pk": 1,
+        "fields": {
+            "name": "CT"
+        }
+    },
+    {
+        "model": "demo_database.Side",
+        "pk": 2,
+        "fields": {
+            "name": "TERRORIST"
+        }
+    },
+    {
+        "model": "demo_database.Map",
+        "pk": 1,
+        "fields": {
+            "name": "de_train"
+        }
+    },
+    {
+        "model": "demo_database.Map",
+        "pk": 2,
+        "fields": {
+            "name": "de_dust2"
+        }
+    },
+    {
+        "model": "demo_database.Map",
+        "pk": 3,
+        "fields": {
+            "name": "de_mirage"
+        }
+    },
+    {
+        "model": "demo_database.Map",
+        "pk": 4,
+        "fields": {
+            "name": "de_nuke"
+        }
+    },
+    {
+        "model": "demo_database.Map",
+        "pk": 5,
+        "fields": {
+            "name": "de_anubis"
+        }
+    },
+    {
+        "model": "demo_database.Map",
+        "pk": 6,
+        "fields": {
+            "name": "de_ancient"
+        }
+    },
+    {
+        "model": "demo_database.Map",
+        "pk": 7,
+        "fields": {
+            "name": "de_inferno"
+        }
+    },
+    {
+        "model": "demo_database.MatchType",
+        "pk": 1,
+        "fields": {
+            "code": 11,
+            "name": "Valve Premier",
+            "is_elo": 1
+        }
+    },
+    {
+        "model": "demo_database.MatchType",
+        "pk": 2,
+        "fields": {
+            "code": 12,
+            "name": "Valve Competitive",
+            "is_elo": 0
+        }
+    },
+    {
+        "model": "demo_database.MatchType",
+        "pk": 3,
+        "fields": {
+            "code": 7,
+            "name": "Valve Wingman",
+            "is_elo": 0
+        }
+    },
+    {
+        "model": "demo_database.WinReason",
+        "pk": 1,
+        "fields": {
+            "code": 1,
+            "name": "TargetBombed"
+        }
+    },
+    {
+        "model": "demo_database.WinReason",
+        "pk": 2,
+        "fields": {
+            "code": 2,
+            "name": "VIPEscaped"
+        }
+    },
+    {
+        "model": "demo_database.WinReason",
+        "pk": 3,
+        "fields": {
+            "code": 3,
+            "name": "VIPKilled"
+        }
+    },
+    {
+        "model": "demo_database.WinReason",
+        "pk": 4,
+        "fields": {
+            "code": 4,
+            "name": "TerroristsEscaped"
+        }
+    },
+    {
+        "model": "demo_database.WinReason",
+        "pk": 5,
+        "fields": {
+            "code": 5,
+            "name": "CTStoppedEscape"
+        }
+    },
+    {
+        "model": "demo_database.WinReason",
+        "pk": 6,
+        "fields": {
+            "code": 6,
+            "name": "TerroristsStopped"
+        }
+    },
+    {
+        "model": "demo_database.WinReason",
+        "pk": 7,
+        "fields": {
+            "code": 7,
+            "name": "BombDefused"
+        }
+    },
+    {
+        "model": "demo_database.WinReason",
+        "pk": 8,
+        "fields": {
+            "code": 8,
+            "name": "CTWin"
+        }
+    },
+    {
+        "model": "demo_database.WinReason",
+        "pk": 9,
+        "fields": {
+            "code": 9,
+            "name": "TerroristsWin"
+        }
+    },
+    {
+        "model": "demo_database.WinReason",
+        "pk": 10,
+        "fields": {
+            "code": 10,
+            "name": "Draw"
+        }
+    },
+    {
+        "model": "demo_database.WinReason",
+        "pk": 11,
+        "fields": {
+            "code": 11,
+            "name": "HostagesRescued"
+        }
+    },
+    {
+        "model": "demo_database.WinReason",
+        "pk": 12,
+        "fields": {
+            "code": 12,
+            "name": "TargetSaved"
+        }
+    },
+    {
+        "model": "demo_database.WinReason",
+        "pk": 13,
+        "fields": {
+            "code": 13,
+            "name": "HostagesNotRescued"
+        }
+    },
+    {
+        "model": "demo_database.WinReason",
+        "pk": 14,
+        "fields": {
+            "code": 14,
+            "name": "TerroristsNotEscaped"
+        }
+    },
+    {
+        "model": "demo_database.WinReason",
+        "pk": 15,
+        "fields": {
+            "code": 15,
+            "name": "VIPNotEscaped"
+        }
+    },
+    {
+        "model": "demo_database.WinReason",
+        "pk": 16,
+        "fields": {
+            "code": 16,
+            "name": "GameStart"
+        }
+    },
+    {
+        "model": "demo_database.WinReason",
+        "pk": 17,
+        "fields": {
+            "code": 17,
+            "name": "TerroristsSurrender"
+        }
+    },
+    {
+        "model": "demo_database.WinReason",
+        "pk": 18,
+        "fields": {
+            "code": 18,
+            "name": "CTSurrender"
+        }
+    },
+    {
+        "model": "demo_database.BuyType",
+        "pk": 1,
+        "fields": {
+            "name": "pistol",
+            "equipment_value_from": 0,
+            "equipment_value_to": 0,
+            "is_pistol": 1
+        }
+    },
+    {
+        "model": "demo_database.BuyType",
+        "pk": 2,
+        "fields": {
+            "name": "force",
+            "equipment_value_from": 1001,
+            "equipment_value_to": 2000,
+            "is_pistol": 0
+        }
+    },
+    {
+        "model": "demo_database.BuyType",
+        "pk": 3,
+        "fields": {
+            "name": "semi_buy",
+            "equipment_value_from": 2001,
+            "equipment_value_to": 4000,
+            "is_pistol": 0
+        }
+    },
+    {
+        "model": "demo_database.BuyType",
+        "pk": 4,
+        "fields": {
+            "name": "eco",
+            "equipment_value_from": 0,
+            "equipment_value_to": 1000,
+            "is_pistol": 0
+        }
+    },
+    {
+        "model": "demo_database.BuyType",
+        "pk": 5,
+        "fields": {
+            "name": "full_buy",
+            "equipment_value_from": 4001,
+            "equipment_value_to": 160000,
+            "is_pistol": 0
+        }
+    },
+    {
+        "model": "demo_database.MMRank",
+        "pk": 1,
+        "fields": {
+            "code": 1,
+            "name": "Silver 1"
+        }
+    },
+    {
+        "model": "demo_database.MMRank",
+        "pk": 2,
+        "fields": {
+            "code": 2,
+            "name": "Silver 2"
+        }
+    },
+    {
+        "model": "demo_database.MMRank",
+        "pk": 3,
+        "fields": {
+            "code": 3,
+            "name": "Silver 3"
+        }
+    },
+    {
+        "model": "demo_database.MMRank",
+        "pk": 4,
+        "fields": {
+            "code": 4,
+            "name": "Silver 4"
+        }
+    },
+    {
+        "model": "demo_database.MMRank",
+        "pk": 5,
+        "fields": {
+            "code": 5,
+            "name": "Silver Elite"
+        }
+    },
+    {
+        "model": "demo_database.MMRank",
+        "pk": 6,
+        "fields": {
+            "code": 6,
+            "name": "Silver Elite Master"
+        }
+    },
+    {
+        "model": "demo_database.MMRank",
+        "pk": 7,
+        "fields": {
+            "code": 7,
+            "name": "Gold Nova 1"
+        }
+    },
+    {
+        "model": "demo_database.MMRank",
+        "pk": 8,
+        "fields": {
+            "code": 8,
+            "name": "Gold Nova 2"
+        }
+    },
+    {
+        "model": "demo_database.MMRank",
+        "pk": 9,
+        "fields": {
+            "code": 9,
+            "name": "Gold Nova 3"
+        }
+    },
+    {
+        "model": "demo_database.MMRank",
+        "pk": 10,
+        "fields": {
+            "code": 10,
+            "name": "Gold Nova Master"
+        }
+    },
+    {
+        "model": "demo_database.MMRank",
+        "pk": 11,
+        "fields": {
+            "code": 11,
+            "name": "Master Guardian 1"
+        }
+    },
+    {
+        "model": "demo_database.MMRank",
+        "pk": 12,
+        "fields": {
+            "code": 12,
+            "name": "Master Guardian 2"
+        }
+    },
+    {
+        "model": "demo_database.MMRank",
+        "pk": 13,
+        "fields": {
+            "code": 13,
+            "name": "Master Guardian Elite"
+        }
+    },
+    {
+        "model": "demo_database.MMRank",
+        "pk": 14,
+        "fields": {
+            "code": 14,
+            "name": "Distinguished Master Guardian"
+        }
+    },
+    {
+        "model": "demo_database.MMRank",
+        "pk": 15,
+        "fields": {
+            "code": 15,
+            "name": "Legendary Eagle"
+        }
+    },
+    {
+        "model": "demo_database.MMRank",
+        "pk": 16,
+        "fields": {
+            "code": 16,
+            "name": "Legendary Eagle Master"
+        }
+    },
+    {
+        "model": "demo_database.MMRank",
+        "pk": 17,
+        "fields": {
+            "code": 17,
+            "name": "Supreme Master First Class"
+        }
+    },
+    {
+        "model": "demo_database.MMRank",
+        "pk": 18,
+        "fields": {
+            "code": 18,
+            "name": "The Global Elite"
+        }
+    },
+    {
+        "model": "demo_database.MMRank",
+        "pk": 18,
+        "fields": {
+            "code": 0,
+            "name": "None"
+        }
+    },
+    {
+        "model": "demo_database.WeaponType",
+        "pk": 1,
+        "fields": {
+            "name": "pistols"
+        }
+    },
+    {
+        "model": "demo_database.WeaponType",
+        "pk": 2,
+        "fields": {
+            "name": "heavy"
+        }
+    },
+    {
+        "model": "demo_database.WeaponType",
+        "pk": 3,
+        "fields": {
+            "name": "smg"
+        }
+    },
+    {
+        "model": "demo_database.WeaponType",
+        "pk": 4,
+        "fields": {
+            "name": "rifles"
+        }
+    },
+    {
+        "model": "demo_database.WeaponType",
+        "pk": 5,
+        "fields": {
+            "name": "sniper"
+        }
+    },
+    {
+        "model": "demo_database.WeaponType",
+        "pk": 6,
+        "fields": {
+            "name": "melee"
+        }
+    },
+    {
+        "model": "demo_database.WeaponType",
+        "pk": 7,
+        "fields": {
+            "name": "grenade"
+        }
+    },
+    {
+        "model": "demo_database.Weapon",
+        "pk": 1,
+        "fields": {
+            "name": "weapon_revolver",
+            "weapon_type_id": 1
+        }
+    },
+    {
+        "model": "demo_database.Weapon",
+        "pk": 2,
+        "fields": {
+            "name": "weapon_glock",
+            "weapon_type_id": 1
+        }
+    },
+    {
+        "model": "demo_database.Weapon",
+        "pk": 3,
+        "fields": {
+            "name": "weapon_usp_silencer",
+            "weapon_type_id": 1
+        }
+    },
+    {
+        "model": "demo_database.Weapon",
+        "pk": 4,
+        "fields": {
+            "name": "weapon_p250",
+            "weapon_type_id": 1
+        }
+    },
+    {
+        "model": "demo_database.Weapon",
+        "pk": 5,
+        "fields": {
+            "name": "weapon_deagle",
+            "weapon_type_id": 1
+        }
+    },
+    {
+        "model": "demo_database.Weapon",
+        "pk": 6,
+        "fields": {
+            "name": "weapon_elite",
+            "weapon_type_id": 1
+        }
+    },
+    {
+        "model": "demo_database.Weapon",
+        "pk": 7,
+        "fields": {
+            "name": "weapon_fiveseven",
+            "weapon_type_id": 1
+        }
+    },
+    {
+        "model": "demo_database.Weapon",
+        "pk": 8,
+        "fields": {
+            "name": "weapon_tec9",
+            "weapon_type_id": 1
+        }
+    },
+    {
+        "model": "demo_database.Weapon",
+        "pk": 9,
+        "fields": {
+            "name": "weapon_cz75a",
+            "weapon_type_id": 1
+        }
+    },
+    {
+        "model": "demo_database.Weapon",
+        "pk": 10,
+        "fields": {
+            "name": "weapon_hkp2000",
+            "weapon_type_id": 1
+        }
+    },
+    {
+        "model": "demo_database.Weapon",
+        "pk": 11,
+        "fields": {
+            "name": "weapon_nova",
+            "weapon_type_id": 2
+        }
+    },
+    {
+        "model": "demo_database.Weapon",
+        "pk": 12,
+        "fields": {
+            "name": "weapon_xm1014",
+            "weapon_type_id": 2
+        }
+    },
+    {
+        "model": "demo_database.Weapon",
+        "pk": 13,
+        "fields": {
+            "name": "weapon_mag7",
+            "weapon_type_id": 2
+        }
+    },
+    {
+        "model": "demo_database.Weapon",
+        "pk": 14,
+        "fields": {
+            "name": "weapon_sawedoff",
+            "weapon_type_id": 2
+        }
+    },
+    {
+        "model": "demo_database.Weapon",
+        "pk": 15,
+        "fields": {
+            "name": "weapon_negev",
+            "weapon_type_id": 2
+        }
+    },
+    {
+        "model": "demo_database.Weapon",
+        "pk": 16,
+        "fields": {
+            "name": "weapon_m249",
+            "weapon_type_id": 2
+        }
+    },
+    {
+        "model": "demo_database.Weapon",
+        "pk": 17,
+        "fields": {
+            "name": "weapon_mac10",
+            "weapon_type_id": 3
+        }
+    },
+    {
+        "model": "demo_database.Weapon",
+        "pk": 18,
+        "fields": {
+            "name": "weapon_mp9",
+            "weapon_type_id": 3
+        }
+    },
+    {
+        "model": "demo_database.Weapon",
+        "pk": 19,
+        "fields": {
+            "name": "weapon_mp7",
+            "weapon_type_id": 3
+        }
+    },
+    {
+        "model": "demo_database.Weapon",
+        "pk": 20,
+        "fields": {
+            "name": "weapon_ump45",
+            "weapon_type_id": 3
+        }
+    },
+    {
+        "model": "demo_database.Weapon",
+        "pk": 21,
+        "fields": {
+            "name": "weapon_p90",
+            "weapon_type_id": 3
+        }
+    },
+    {
+        "model": "demo_database.Weapon",
+        "pk": 22,
+        "fields": {
+            "name": "weapon_bizon",
+            "weapon_type_id": 3
+        }
+    },
+    {
+        "model": "demo_database.Weapon",
+        "pk": 23,
+        "fields": {
+            "name": "weapon_mp5sd",
+            "weapon_type_id": 3
+        }
+    },
+    {
+        "model": "demo_database.Weapon",
+        "pk": 24,
+        "fields": {
+            "name": "weapon_galilar",
+            "weapon_type_id": 4
+        }
+    },
+    {
+        "model": "demo_database.Weapon",
+        "pk": 25,
+        "fields": {
+            "name": "weapon_famas",
+            "weapon_type_id": 4
+        }
+    },
+    {
+        "model": "demo_database.Weapon",
+        "pk": 26,
+        "fields": {
+            "name": "weapon_ak47",
+            "weapon_type_id": 4
+        }
+    },
+    {
+        "model": "demo_database.Weapon",
+        "pk": 27,
+        "fields": {
+            "name": "weapon_m4a1",
+            "weapon_type_id": 4
+        }
+    },
+    {
+        "model": "demo_database.Weapon",
+        "pk": 28,
+        "fields": {
+            "name": "weapon_m4a1_silencer",
+            "weapon_type_id": 4
+        }
+    },
+    {
+        "model": "demo_database.Weapon",
+        "pk": 29,
+        "fields": {
+            "name": "weapon_ssg08",
+            "weapon_type_id": 5
+        }
+    },
+    {
+        "model": "demo_database.Weapon",
+        "pk": 30,
+        "fields": {
+            "name": "weapon_sg556",
+            "weapon_type_id": 4
+        }
+    },
+    {
+        "model": "demo_database.Weapon",
+        "pk": 31,
+        "fields": {
+            "name": "weapon_aug",
+            "weapon_type_id": 4
+        }
+    },
+    {
+        "model": "demo_database.Weapon",
+        "pk": 32,
+        "fields": {
+            "name": "weapon_awp",
+            "weapon_type_id": 5
+        }
+    },
+    {
+        "model": "demo_database.Weapon",
+        "pk": 33,
+        "fields": {
+            "name": "weapon_scar20",
+            "weapon_type_id": 5
+        }
+    },
+    {
+        "model": "demo_database.Weapon",
+        "pk": 34,
+        "fields": {
+            "name": "weapon_g3sg1",
+            "weapon_type_id": 5
+        }
+    },
+    {
+        "model": "demo_database.Weapon",
+        "pk": 35,
+        "fields": {
+            "name": "weapon_knife",
+            "weapon_type_id": 6
+        }
+    },
+    {
+        "model": "demo_database.Weapon",
+        "pk": 36,
+        "fields": {
+            "name": "weapon_taser",
+            "weapon_type_id": 6
+        }
+    },
+    {
+        "model": "demo_database.Weapon",
+        "pk": 37,
+        "fields": {
+            "name": "weapon_molotov",
+            "weapon_type_id": 7
+        }
+    },
+    {
+        "model": "demo_database.Weapon",
+        "pk": 38,
+        "fields": {
+            "name": "weapon_flashbang",
+            "weapon_type_id": 7
+        }
+    },
+    {
+        "model": "demo_database.Weapon",
+        "pk": 39,
+        "fields": {
+            "name": "weapon_hegrenade",
+            "weapon_type_id": 7
+        }
+    },
+    {
+        "model": "demo_database.Weapon",
+        "pk": 40,
+        "fields": {
+            "name": "weapon_decoy",
+            "weapon_type_id": 7
+        }
+    },
+    {
+        "model": "demo_database.Weapon",
+        "pk": 41,
+        "fields": {
+            "name": "weapon_smokegrenade",
+            "weapon_type_id": 7
+        }
+    },
+    {
+        "model": "demo_database.Weapon",
+        "pk": 42,
+        "fields": {
+            "name": "weapon_incgrenade",
+            "weapon_type_id": 7
+        }
+    },
+    {
+        "model": "demo_database.Weapon",
+        "pk": 43,
+        "fields": {
+            "name": "weapon_inferno",
+            "weapon_type_id": 7
+        }
+    },
+    {
+        "model": "demo_database.HitGroup",
+        "pk": 1,
+        "fields": {
+            "name": "8"
+        }
+    },
+    {
+        "model": "demo_database.HitGroup",
+        "pk": 2,
+        "fields": {
+            "name": "chest"
+        }
+    },
+    {
+        "model": "demo_database.HitGroup",
+        "pk": 3,
+        "fields": {
+            "name": "generic"
+        }
+    },
+    {
+        "model": "demo_database.HitGroup",
+        "pk": 4,
+        "fields": {
+            "name": "head"
+        }
+    },
+    {
+        "model": "demo_database.HitGroup",
+        "pk": 5,
+        "fields": {
+            "name": "left_arm"
+        }
+    },
+    {
+        "model": "demo_database.HitGroup",
+        "pk": 6,
+        "fields": {
+            "name": "left_leg"
+        }
+    },
+    {
+        "model": "demo_database.HitGroup",
+        "pk": 7,
+        "fields": {
+            "name": "right_arm"
+        }
+    },
+    {
+        "model": "demo_database.HitGroup",
+        "pk": 8,
+        "fields": {
+            "name": "right_leg"
+        }
+    },
+    {
+        "model": "demo_database.HitGroup",
+        "pk": 9,
+        "fields": {
+            "name": "stomach"
+        }
+    }
+]

@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'analyzer.apps.AnalyzerConfig',
     'demo_database.apps.DemoDatabaseConfig',
+    'api.apps.ApiConfig'
 ]
 
 MIDDLEWARE = [

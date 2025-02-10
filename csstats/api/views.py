@@ -1,33 +1,40 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.parsers import MultiPartParser
 from rest_framework import status
-from demoparser.demoparser import get_stats
-from demo_database.savedb import save_stats
+from demoparser.demoparser import get_stats, watch_demo
+from demo_database.savedb import save_demo
 from steam.steamapi import get_players_names_and_avatars
 from demo_database.models import ScoreBoard, Demo, Player
 from demo_database.serializers import ScoreBoardSerializer, PlayersMatchesSerializer
 import json
 import os
 import tempfile
+from .models import UploadedFile
+from .serializers import UploadedFileSerializer
 
 
 class DemoFileUploadView(APIView):
+    parser_classes = [MultiPartParser]
+
     def post(self, request, *args, **kwargs):
-        file_obj = request.FILES['file']
+        file_serializer = UploadedFileSerializer(data=request.data)
 
-        # Создаем временный файл
-        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-            temp_file.write(file_obj.read())
-            temp_file_path = temp_file.name
+        if file_serializer.is_valid():
+            uploaded_file = file_serializer.save()
+            file_path = uploaded_file.file.path
 
-        try:
-            # Обрабатываем файл
-            data = get_stats(temp_file_path)
-            demo_id = save_stats(data)
-            return Response({'demo_id': demo_id}, status=status.HTTP_200_OK)
-        finally:
-            # Удаляем временный файл
-            os.remove(temp_file_path)
+            try:
+                demo_id = save_demo(file_path)
+            finally:
+                if os.path.exists(file_path):
+                    os.remove(file_path)
+
+                uploaded_file.delete()
+
+            return Response({"demo_id": demo_id}, status=status.HTTP_200_OK)
+        else:
+            return Response(file_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ScoreBoardDetailView(APIView):
@@ -52,4 +59,9 @@ class PlayerMatchesView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Player.DoesNotExist:
             return Response({"error": "Player not found"}, status=status.HTTP_404_NOT_FOUND)
-        
+
+
+class WathDemo(APIView):
+    def get(self, request):
+        response = watch_demo()
+        return Response(response, status=status.HTTP_200_OK)
