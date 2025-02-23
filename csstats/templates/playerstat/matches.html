@@ -1,0 +1,46 @@
+{% extends "playerstat/main.html" %}
+{% load django_bootstrap5 %}
+{% block data %}
+    <table>
+        <thead>
+            <tr>
+                <th>Map</th>
+                <th>Kills</th>
+                <th>Assists</th>
+                <th>Deaths</th>
+                <th>ADR</th>
+                <th>Win Clutches 1x1</th>
+                <th>Win Clutches 1x2</th>
+                <th>Win Clutches 1x3</th>
+                <th>Win Clutches 1x4</th>
+                <th>Win Clutches 1x5</th>
+                <th>Kills 3</th>
+                <th>Kills 4</th>
+                <th>Kills 5</th>
+                <th>Rating</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for player_in_demo in player_demos %}
+                <tr>
+                    <td>{{ player_in_demo.demo.map.name }}</td>
+                    <td>{{ player_in_demo.kills }}</td>
+                    <td>{{ player_in_demo.assists }}</td>
+                    <td>{{ player_in_demo.deaths }}</td>
+                    <td>{{ player_in_demo.adr }}</td>
+                    <td>{{ player_in_demo.win_clutches_1x1 }}</td>
+                    <td>{{ player_in_demo.win_clutches_1x2 }}</td>
+                    <td>{{ player_in_demo.win_clutches_1x3 }}</td>
+                    <td>{{ player_in_demo.win_clutches_1x4 }}</td>
+                    <td>{{ player_in_demo.win_clutches_1x5 }}</td>
+                    <td>{{ player_in_demo.kills_3 }}</td>
+                    <td>{{ player_in_demo.kills_4 }}</td>
+                    <td>{{ player_in_demo.kills_5 }}</td>
+                    <td>{{ player_in_demo.rating|floatformat:2}}</td>
+                    <td><a href="{% url 'mapstat:demo' player_in_demo.demo.pk %}"/>Demo</td>
+                    <td colspan="28"></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

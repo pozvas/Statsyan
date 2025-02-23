@@ -1,0 +1,125 @@
+{% extends "mapstat/main.html" %}
+{% load django_bootstrap5 %}
+{% block data %}
+    <h1>Scoreboard for Demo {{ demo.pk }}</h1>
+
+    <form method="GET" action="">
+        <label for="side">Filter by Side:</label>
+        <select id="side" name="side">
+            <option value="">All</option>
+            {% for side in sides %}
+                <option value="{{ side.id }}" {% if request.GET.side == side.id|stringformat:"s" %}selected{% endif %}>{{ side.name }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="buy_type">Filter by Buy Type:</label>
+        <select id="buy_type" name="buy_type">
+            <option value="">All</option>
+            {% for buy_type in buy_types %}
+                <option value="{{ buy_type.id }}" {% if request.GET.buy_type == buy_type.id|stringformat:"s" %}selected{% endif %}>{{ buy_type.name }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="enemy_buy_type">Filter by Enemy Buy Type:</label>
+        <select id="enemy_buy_type" name="enemy_buy_type">
+            <option value="">All</option>
+            {% for buy_type in buy_types %}
+                <option value="{{ buy_type.id }}" {% if request.GET.enemy_buy_type == buy_type.id|stringformat:"s" %}selected{% endif %}>{{ buy_type.name }}</option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">Filter</button>
+    </form>
+
+    <h2>Player Statistics</h2>
+    {% for team_name in teams_name %}
+        <h3> {{ team_name }} </h3>
+        <h4> 
+            {% if demo.win_team == team_name %} {{ demo.score_win }} {% else %} {{ demo.score_lose }} {% endif %}
+        </h4>
+        {% if demo.win_team == team_name %}
+            <p> 
+                Победитель 
+            </p>
+        {% endif %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Player</th>
+                    <th>ELO Old</th>
+                    <th>ELO New</th>
+                    <th>Rank</th>
+                    <th>Rounds</th>
+                    <th>Kills</th>
+                    <th>Assists</th>
+                    <th>Deaths</th>
+                    <th>Damage</th>
+                    <th>KAST Rounds</th>
+                    <th>Win Clutches 1x1</th>
+                    <th>Win Clutches 1x2</th>
+                    <th>Win Clutches 1x3</th>
+                    <th>Win Clutches 1x4</th>
+                    <th>Win Clutches 1x5</th>
+                    <th>Loss Clutches 1x1</th>
+                    <th>Loss Clutches 1x2</th>
+                    <th>Loss Clutches 1x3</th>
+                    <th>Loss Clutches 1x4</th>
+                    <th>Loss Clutches 1x5</th>
+                    <th>Kills 1</th>
+                    <th>Kills 2</th>
+                    <th>Kills 3</th>
+                    <th>Kills 4</th>
+                    <th>Kills 5</th>
+                    <th>First Kills</th>
+                    <th>First Deaths</th>
+                    <th>Utility Damage</th>
+                    <th>Enemy Flashed</th>
+                    <th>Flash Assists</th>
+                    <th>Impact</th>
+                    <th>Rating</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for player_in_demo in players_in_demo %}
+                    {% if player_in_demo.team == team_name %}
+                        <tr>
+                            <td>{{ player_in_demo.player.last_nickname }}</td>
+                            <td>{{ player_in_demo.elo_old }}</td>
+                            <td>{{ player_in_demo.elo_new }}</td>
+                            <td>{{ player_in_demo.rang.name }}</td>
+                            <td>{{ player_in_demo.rounds }}</td>
+                            <td>{{ player_in_demo.kills }}</td>
+                            <td>{{ player_in_demo.assists }}</td>
+                            <td>{{ player_in_demo.deaths }}</td>
+                            <td>{{ player_in_demo.damage }}</td>
+                            <td>{{ player_in_demo.kast_rounds }}</td>
+                            <td>{{ player_in_demo.win_clutches_1x1 }}</td>
+                            <td>{{ player_in_demo.win_clutches_1x2 }}</td>
+                            <td>{{ player_in_demo.win_clutches_1x3 }}</td>
+                            <td>{{ player_in_demo.win_clutches_1x4 }}</td>
+                            <td>{{ player_in_demo.win_clutches_1x5 }}</td>
+                            <td>{{ player_in_demo.loss_clutches_1x1 }}</td>
+                            <td>{{ player_in_demo.loss_clutches_1x2 }}</td>
+                            <td>{{ player_in_demo.loss_clutches_1x3 }}</td>
+                            <td>{{ player_in_demo.loss_clutches_1x4 }}</td>
+                            <td>{{ player_in_demo.loss_clutches_1x5 }}</td>
+                            <td>{{ player_in_demo.kills_1 }}</td>
+                            <td>{{ player_in_demo.kills_2 }}</td>
+                            <td>{{ player_in_demo.kills_3 }}</td>
+                            <td>{{ player_in_demo.kills_4 }}</td>
+                            <td>{{ player_in_demo.kills_5 }}</td>
+                            <td>{{ player_in_demo.first_kills }}</td>
+                            <td>{{ player_in_demo.first_deaths }}</td>
+                            <td>{{ player_in_demo.utility_damage }}</td>
+                            <td>{{ player_in_demo.enemy_flashed }}</td>
+                            <td>{{ player_in_demo.flash_assists }}</td>
+                            <td>{{ player_in_demo.impact|floatformat:2 }}</td>
+                            <td>{{ player_in_demo.rating|floatformat:2}}</td>
+                            <td colspan="28"></td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endfor %}
+{% endblock %}

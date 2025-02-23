@@ -90,11 +90,21 @@
         }
     },
     {
+        "model": "demo_database.MatchType",
+        "pk": 4,
+        "fields": {
+            "code": -1,
+            "name": "Other",
+            "is_elo": 0
+        }
+    },
+    {
         "model": "demo_database.WinReason",
         "pk": 1,
         "fields": {
             "code": 1,
-            "name": "TargetBombed"
+            "name": "TargetBombed",
+            "win_side": 2
         }
     },
     {
@@ -102,7 +112,8 @@
         "pk": 2,
         "fields": {
             "code": 2,
-            "name": "VIPEscaped"
+            "name": "VIPEscaped",
+            "win_side": null
         }
     },
     {
@@ -110,7 +121,8 @@
         "pk": 3,
         "fields": {
             "code": 3,
-            "name": "VIPKilled"
+            "name": "VIPKilled",
+            "win_side": null
         }
     },
     {
@@ -118,7 +130,9 @@
         "pk": 4,
         "fields": {
             "code": 4,
-            "name": "TerroristsEscaped"
+            "name": "TerroristsEscaped",
+            "win_side": null
+            
         }
     },
     {
@@ -126,7 +140,8 @@
         "pk": 5,
         "fields": {
             "code": 5,
-            "name": "CTStoppedEscape"
+            "name": "CTStoppedEscape",
+            "win_side": null
         }
     },
     {
@@ -142,7 +157,8 @@
         "pk": 7,
         "fields": {
             "code": 7,
-            "name": "BombDefused"
+            "name": "BombDefused",
+            "win_side": 1
         }
     },
     {
@@ -150,7 +166,8 @@
         "pk": 8,
         "fields": {
             "code": 8,
-            "name": "CTWin"
+            "name": "CTWin",
+            "win_side": 1
         }
     },
     {
@@ -158,7 +175,8 @@
         "pk": 9,
         "fields": {
             "code": 9,
-            "name": "TerroristsWin"
+            "name": "TerroristsWin",
+            "win_side": 2
         }
     },
     {
@@ -174,7 +192,8 @@
         "pk": 11,
         "fields": {
             "code": 11,
-            "name": "HostagesRescued"
+            "name": "HostagesRescued",
+            "win_side": 1
         }
     },
     {
@@ -182,7 +201,8 @@
         "pk": 12,
         "fields": {
             "code": 12,
-            "name": "TargetSaved"
+            "name": "TargetSaved",
+            "win_side": 1
         }
     },
     {
@@ -190,7 +210,8 @@
         "pk": 13,
         "fields": {
             "code": 13,
-            "name": "HostagesNotRescued"
+            "name": "HostagesNotRescued",
+            "win_side": 2
         }
     },
     {
@@ -198,7 +219,8 @@
         "pk": 14,
         "fields": {
             "code": 14,
-            "name": "TerroristsNotEscaped"
+            "name": "TerroristsNotEscaped",
+            "win_side": null
         }
     },
     {
@@ -206,7 +228,8 @@
         "pk": 15,
         "fields": {
             "code": 15,
-            "name": "VIPNotEscaped"
+            "name": "VIPNotEscaped",
+            "win_side": null
         }
     },
     {
@@ -214,7 +237,8 @@
         "pk": 16,
         "fields": {
             "code": 16,
-            "name": "GameStart"
+            "name": "GameStart",
+            "win_side": null
         }
     },
     {
@@ -222,7 +246,8 @@
         "pk": 17,
         "fields": {
             "code": 17,
-            "name": "TerroristsSurrender"
+            "name": "TerroristsSurrender",
+            "win_side": 1
         }
     },
     {
@@ -230,7 +255,8 @@
         "pk": 18,
         "fields": {
             "code": 18,
-            "name": "CTSurrender"
+            "name": "CTSurrender",
+            "win_side": 2
         }
     },
     {
@@ -489,7 +515,7 @@
         "pk": 1,
         "fields": {
             "name": "weapon_revolver",
-            "weapon_type_id": 1
+            "weapon_type": 1
         }
     },
     {
@@ -497,7 +523,7 @@
         "pk": 2,
         "fields": {
             "name": "weapon_glock",
-            "weapon_type_id": 1
+            "weapon_type": 1
         }
     },
     {
@@ -505,7 +531,7 @@
         "pk": 3,
         "fields": {
             "name": "weapon_usp_silencer",
-            "weapon_type_id": 1
+            "weapon_type": 1
         }
     },
     {
@@ -513,7 +539,7 @@
         "pk": 4,
         "fields": {
             "name": "weapon_p250",
-            "weapon_type_id": 1
+            "weapon_type": 1
         }
     },
     {
@@ -521,7 +547,7 @@
         "pk": 5,
         "fields": {
             "name": "weapon_deagle",
-            "weapon_type_id": 1
+            "weapon_type": 1
         }
     },
     {
@@ -529,7 +555,7 @@
         "pk": 6,
         "fields": {
             "name": "weapon_elite",
-            "weapon_type_id": 1
+            "weapon_type": 1
         }
     },
     {
@@ -537,7 +563,7 @@
         "pk": 7,
         "fields": {
             "name": "weapon_fiveseven",
-            "weapon_type_id": 1
+            "weapon_type": 1
         }
     },
     {
@@ -545,7 +571,7 @@
         "pk": 8,
         "fields": {
             "name": "weapon_tec9",
-            "weapon_type_id": 1
+            "weapon_type": 1
         }
     },
     {
@@ -553,7 +579,7 @@
         "pk": 9,
         "fields": {
             "name": "weapon_cz75a",
-            "weapon_type_id": 1
+            "weapon_type": 1
         }
     },
     {
@@ -561,7 +587,7 @@
         "pk": 10,
         "fields": {
             "name": "weapon_hkp2000",
-            "weapon_type_id": 1
+            "weapon_type": 1
         }
     },
     {
@@ -569,7 +595,7 @@
         "pk": 11,
         "fields": {
             "name": "weapon_nova",
-            "weapon_type_id": 2
+            "weapon_type": 2
         }
     },
     {
@@ -577,7 +603,7 @@
         "pk": 12,
         "fields": {
             "name": "weapon_xm1014",
-            "weapon_type_id": 2
+            "weapon_type": 2
         }
     },
     {
@@ -585,7 +611,7 @@
         "pk": 13,
         "fields": {
             "name": "weapon_mag7",
-            "weapon_type_id": 2
+            "weapon_type": 2
         }
     },
     {
@@ -593,7 +619,7 @@
         "pk": 14,
         "fields": {
             "name": "weapon_sawedoff",
-            "weapon_type_id": 2
+            "weapon_type": 2
         }
     },
     {
@@ -601,7 +627,7 @@
         "pk": 15,
         "fields": {
             "name": "weapon_negev",
-            "weapon_type_id": 2
+            "weapon_type": 2
         }
     },
     {
@@ -609,7 +635,7 @@
         "pk": 16,
         "fields": {
             "name": "weapon_m249",
-            "weapon_type_id": 2
+            "weapon_type": 2
         }
     },
     {
@@ -617,7 +643,7 @@
         "pk": 17,
         "fields": {
             "name": "weapon_mac10",
-            "weapon_type_id": 3
+            "weapon_type": 3
         }
     },
     {
@@ -625,7 +651,7 @@
         "pk": 18,
         "fields": {
             "name": "weapon_mp9",
-            "weapon_type_id": 3
+            "weapon_type": 3
         }
     },
     {
@@ -633,7 +659,7 @@
         "pk": 19,
         "fields": {
             "name": "weapon_mp7",
-            "weapon_type_id": 3
+            "weapon_type": 3
         }
     },
     {
@@ -641,7 +667,7 @@
         "pk": 20,
         "fields": {
             "name": "weapon_ump45",
-            "weapon_type_id": 3
+            "weapon_type": 3
         }
     },
     {
@@ -649,7 +675,7 @@
         "pk": 21,
         "fields": {
             "name": "weapon_p90",
-            "weapon_type_id": 3
+            "weapon_type": 3
         }
     },
     {
@@ -657,7 +683,7 @@
         "pk": 22,
         "fields": {
             "name": "weapon_bizon",
-            "weapon_type_id": 3
+            "weapon_type": 3
         }
     },
     {
@@ -665,7 +691,7 @@
         "pk": 23,
         "fields": {
             "name": "weapon_mp5sd",
-            "weapon_type_id": 3
+            "weapon_type": 3
         }
     },
     {
@@ -673,7 +699,7 @@
         "pk": 24,
         "fields": {
             "name": "weapon_galilar",
-            "weapon_type_id": 4
+            "weapon_type": 4
         }
     },
     {
@@ -681,7 +707,7 @@
         "pk": 25,
         "fields": {
             "name": "weapon_famas",
-            "weapon_type_id": 4
+            "weapon_type": 4
         }
     },
     {
@@ -689,7 +715,7 @@
         "pk": 26,
         "fields": {
             "name": "weapon_ak47",
-            "weapon_type_id": 4
+            "weapon_type": 4
         }
     },
     {
@@ -697,7 +723,7 @@
         "pk": 27,
         "fields": {
             "name": "weapon_m4a1",
-            "weapon_type_id": 4
+            "weapon_type": 4
         }
     },
     {
@@ -705,7 +731,7 @@
         "pk": 28,
         "fields": {
             "name": "weapon_m4a1_silencer",
-            "weapon_type_id": 4
+            "weapon_type": 4
         }
     },
     {
@@ -713,7 +739,7 @@
         "pk": 29,
         "fields": {
             "name": "weapon_ssg08",
-            "weapon_type_id": 5
+            "weapon_type": 5
         }
     },
     {
@@ -721,7 +747,7 @@
         "pk": 30,
         "fields": {
             "name": "weapon_sg556",
-            "weapon_type_id": 4
+            "weapon_type": 4
         }
     },
     {
@@ -729,7 +755,7 @@
         "pk": 31,
         "fields": {
             "name": "weapon_aug",
-            "weapon_type_id": 4
+            "weapon_type": 4
         }
     },
     {
@@ -737,7 +763,7 @@
         "pk": 32,
         "fields": {
             "name": "weapon_awp",
-            "weapon_type_id": 5
+            "weapon_type": 5
         }
     },
     {
@@ -745,7 +771,7 @@
         "pk": 33,
         "fields": {
             "name": "weapon_scar20",
-            "weapon_type_id": 5
+            "weapon_type": 5
         }
     },
     {
@@ -753,7 +779,7 @@
         "pk": 34,
         "fields": {
             "name": "weapon_g3sg1",
-            "weapon_type_id": 5
+            "weapon_type": 5
         }
     },
     {
@@ -761,7 +787,7 @@
         "pk": 35,
         "fields": {
             "name": "weapon_knife",
-            "weapon_type_id": 6
+            "weapon_type": 6
         }
     },
     {
@@ -769,7 +795,7 @@
         "pk": 36,
         "fields": {
             "name": "weapon_taser",
-            "weapon_type_id": 6
+            "weapon_type": 6
         }
     },
     {
@@ -777,7 +803,7 @@
         "pk": 37,
         "fields": {
             "name": "weapon_molotov",
-            "weapon_type_id": 7
+            "weapon_type": 7
         }
     },
     {
@@ -785,7 +811,7 @@
         "pk": 38,
         "fields": {
             "name": "weapon_flashbang",
-            "weapon_type_id": 7
+            "weapon_type": 7
         }
     },
     {
@@ -793,7 +819,7 @@
         "pk": 39,
         "fields": {
             "name": "weapon_hegrenade",
-            "weapon_type_id": 7
+            "weapon_type": 7
         }
     },
     {
@@ -801,7 +827,7 @@
         "pk": 40,
         "fields": {
             "name": "weapon_decoy",
-            "weapon_type_id": 7
+            "weapon_type": 7
         }
     },
     {
@@ -809,7 +835,7 @@
         "pk": 41,
         "fields": {
             "name": "weapon_smokegrenade",
-            "weapon_type_id": 7
+            "weapon_type": 7
         }
     },
     {
@@ -817,7 +843,7 @@
         "pk": 42,
         "fields": {
             "name": "weapon_incgrenade",
-            "weapon_type_id": 7
+            "weapon_type": 7
         }
     },
     {
@@ -825,7 +851,7 @@
         "pk": 43,
         "fields": {
             "name": "weapon_inferno",
-            "weapon_type_id": 7
+            "weapon_type": 7
         }
     },
     {

@@ -1,0 +1,50 @@
+{% extends "mapstat/main.html" %}
+{% block data %}
+<div id="accordion">
+    {% for round in rounds %}
+    <div class="card mb-3">
+        <div class="card-header" id="heading{{ round.round_number }}">
+            <h2 class="mb-0">
+                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse{{ round.round_number }}" aria-expanded="false" aria-controls="collapse{{ round.round_number }}">
+                    Round {{ round.round_number }}
+                </button>
+            </h2>
+        </div>
+
+        <div id="collapse{{ round.round_number }}" class="collapse" aria-labelledby="heading{{ round.round_number }}" data-parent="#accordion">
+            <div class="card-body">
+                <p><strong>Win Reason:</strong> {{ round.win_reason.name }}</p>
+                <p><strong>CT Team:</strong> {{ round.ct_team_name }}</p>
+                <p><strong>T Team:</strong> {{ round.t_team_name }}</p>
+                <p><strong>Kills T:</strong> {{ round.kills_t }}</p>
+                <p><strong>Kills CT:</strong> {{ round.kills_ct }}</p>
+
+                <h3>Kills in Round {{ round.round_number }}</h3>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Attacker</th>
+                            <th>Victim</th>
+                            <th>Weapon</th>
+                            <th>Headshot</th>
+                            <th>Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for kill in round.kills.all %}
+                            <tr>
+                                <td>{{ kill.attacker.last_nickname }}</td>
+                                <td>{{ kill.victim.last_nickname }}</td>
+                                <td>{{ kill.weapon.name }}</td>
+                                <td>{{ kill.is_headshot|yesno:"Yes,No" }}</td>
+                                <td>{{ kill.kill_time }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

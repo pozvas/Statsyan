@@ -54,18 +54,28 @@ def _merge_many(list: list[pd.DataFrame], how='inner', on=None) -> pd.DataFrame:
 def get_max_tick(parser: DemoParser):
     return parser.parse_event('cs_win_panel_match')['tick'][0]
 
-
+# УЗНАЧТЬ ЧТО БУДЕТ ЕСЛИ ЧЕЛ ЛИВНЕТ ПРИ СМЕНЕ СТОРОН (можно в напарниках)
+# ЧО КАК С НАБЛЮДАТЕЛЯМИ (ХЗ ЕСТЬ ЛИ ОНИ НО НУЖНО ПОНЯТЬ)
+# удалить все команды кроме 2(Т) и 3(СТ)
 def get_start_info(parser: DemoParser) -> pd.DataFrame:
     df = parser.parse_event('cs_win_panel_match')
+    team = parser.parse_event('player_team')
+    min_tick = min(team['tick'].to_list())
+    team = team[(team['tick'] == min_tick) & (team['oldteam'].isin([2, 3]))]
+    team = team.rename(columns={
+        'user_steamid': 'steamid'
+    })
+
     wanted_props = [
         'team_name', 'crosshair_code',
         'rank', 'rank_if_win', 'rank_if_loss', 'rank_if_tie',
-        'team_rounds_total', 'comp_rank_type'
+        'team_rounds_total', 'comp_rank_type', 'team_clan_name'
     ]
     team_name = parser.parse_ticks(wanted_props, ticks=df['tick'])
     team_name['steamid'] = team_name['steamid'].astype(str)
     team_name['map'] = parser.parse_header()['map_name']
-    team_name['global_team_name'] = team_name.apply(lambda row: 'Team 1' if row['team_name'] == 'CT' else 'Team 2', axis=1)
+    team_name = team_name.merge(team[['steamid', 'oldteam']], how='left', on=['steamid'])
+    team_name['global_team_name'] = team_name.apply(lambda row: 'Team ' + str(row['oldteam'] - 1), axis=1)
     team_name['is_tie'] = team_name['team_rounds_total'].drop_duplicates().size == 1
     win_team = team_name.loc[team_name['team_rounds_total'].idxmax()]['global_team_name']
     team_name['is_win'] = team_name.apply(
@@ -75,7 +85,7 @@ def get_start_info(parser: DemoParser) -> pd.DataFrame:
 
     return team_name
 
-
+# НЕ ДЕЛАТЬ ЗАВЯЗКУ НА КОЛИЧЕСТВЕ РАУНДОВ ХАРДКОДОМ
 def get_buy_type_by_rounds(parser: DemoParser) -> pd.DataFrame:
 
     def get_buy_type_name(row):
@@ -94,8 +104,17 @@ def get_buy_type_by_rounds(parser: DemoParser) -> pd.DataFrame:
 
     wanted_ticks = parser.parse_event("round_freeze_end")["tick"].tolist()
     df = parser.parse_ticks(["current_equip_value", "total_rounds_played", 'team_name'], ticks=wanted_ticks)
+    df['steamid'] = df['steamid'].astype(str)
+    start_info = get_start_info(parser)
+    df = df.merge(start_info[['steamid', 'global_team_name']], how="left", on='steamid')
 
-    group_df = df.groupby(['total_rounds_played', 'team_name'])['current_equip_value'].mean().reset_index(name='equip_value')
+    group_df = (
+        df.groupby(['total_rounds_played', 'team_name', 'global_team_name'])
+        .agg(
+            equip_value=('current_equip_value', 'mean'),
+            equip_value_sum=('current_equip_value', 'sum'),)
+        .reset_index()
+    )
     group_df['equip_value_name'] = group_df.apply(get_buy_type_name, axis=1)
 
     group_df = group_df.merge(group_df, on=['total_rounds_played'], suffixes=('', '_enemy'))
@@ -104,7 +123,7 @@ def get_buy_type_by_rounds(parser: DemoParser) -> pd.DataFrame:
 
 
 def get_rounds_count(parser: DemoParser) -> pd.DataFrame:
-    round_start_ticks = parser.parse_event('round_freeze_end')
+    round_start_ticks = parser.parse_event('round_poststart').drop_duplicates()
     round_start = parser.parse_ticks(['player_steamid', 'team_name', "total_rounds_played"], ticks=round_start_ticks['tick'])
     round_start = round_start.merge(get_buy_type_by_rounds(parser), on=['total_rounds_played', 'team_name'])
     rouns_num = round_start.groupby(['steamid', 'team_name', 'equip_value_name', 'equip_value_name_enemy']).size().reset_index(name='rounds')
@@ -419,7 +438,8 @@ def get_utility_damage(parser: DemoParser) -> pd.DataFrame:
     for idx, row in util_dmg.iterrows():
         util_dmg.loc[idx, 'attacker_team_name'] = ticks[(ticks['tick'] == row['tick']) & (ticks['steamid'] == int(row['attacker_steamid']))]['team_name'].iloc[0]
         util_dmg.loc[idx, 'user_team_name'] = ticks[(ticks['tick'] == row['tick']) & (ticks['steamid'] == int(row['user_steamid']))]['team_name'].iloc[0]
-        util_dmg.loc[idx, 'was_health'] = ticks[(ticks['tick'] == row['tick'] - 1) & (ticks['steamid'] == int(row['user_steamid']))]['health'].iloc[0]
+        health_value = ticks[(ticks['tick'] == row['tick'] - 1) & (ticks['steamid'] == int(row['user_steamid']))]['health']
+        util_dmg.loc[idx, 'was_health'] = health_value.iloc[0] if not health_value.empty else row['dmg_health']
 
     util_dmg = util_dmg[util_dmg['user_team_name'] != util_dmg['attacker_team_name']]
     util_dmg = util_dmg.rename(columns={
@@ -478,8 +498,6 @@ def get_kills_and_damage_by_weapon(parser: DemoParser) -> pd.DataFrame:
             df.loc[idx, 'attacker_team_name'] = ticks[(ticks['tick'] == row['tick']) & (ticks['steamid'] == int(row['attacker_steamid']))]['team_name'].iloc[0]
             df.loc[idx, 'user_team_name'] = ticks[(ticks['tick'] == row['tick']) & (ticks['steamid'] == int(row['user_steamid']))]['team_name'].iloc[0]
             if is_damage:
-                # print(row['tick'] - 1)
-                # print(ticks[(ticks['tick'] == row['tick'] - 1) ])
                 df.loc[idx, 'was_health'] = ticks[(ticks['tick'] == row['tick'] - 1) & (ticks['steamid'] == int(row['user_steamid']))]['health'].iloc[0]
 
         df = df[df['user_team_name'] != df['attacker_team_name']]
@@ -662,24 +680,83 @@ def get_duels(parser: DemoParser) -> pd.DataFrame:
     return _merge_many([duels, first_kills_duels, awp_duels], how='left').fillna(0)
 
 
+def get_rounds(parser: DemoParser) -> pd.DataFrame:
+    round_end = parser.parse_event('round_officially_ended').drop_duplicates()
+    round_end['tick'] = round_end['tick'] - 1
+    ticks_end = pd.concat(
+            [
+                round_end,
+                parser.parse_event('cs_win_panel_match')
+            ]
+        )
+    end = parser.parse_ticks(['round_win_reason', 'total_rounds_played'], ticks=ticks_end['tick'])[['round_win_reason', 'total_rounds_played']].drop_duplicates()
+
+    buy_type = get_buy_type_by_rounds(parser)[[
+        'total_rounds_played', 'team_name',
+        'equip_value_name', 'equip_value', 'equip_value_sum',
+        'global_team_name'
+        ]]
+    buy_type['total_rounds_played'] = buy_type['total_rounds_played'] + 1
+
+    return end.merge(
+        buy_type[buy_type['team_name'] == 'CT'][[
+            'total_rounds_played', 'equip_value_name',
+            'equip_value', 'equip_value_sum', 'global_team_name'
+            ]],
+        on=['total_rounds_played'],
+        how='left',
+    ).merge(
+        buy_type[buy_type['team_name'] == 'TERRORIST'][[
+            'total_rounds_played', 'equip_value_name',
+            'equip_value', 'equip_value_sum', 'global_team_name'
+            ]],
+        on=['total_rounds_played'],
+        how='left',
+        suffixes=['_ct', '_t']
+    )
+
+
+def get_kills_in_round(parser: DemoParser) -> pd.DataFrame:
+    deaths = parser.parse_event('player_death', other=['total_rounds_played', "game_time", "round_start_time"]).rename(columns={
+        'user_steamid': 'victim_steamid',
+        'headshot': 'is_headshot',
+        'noscope': 'is_no_scope',
+        'penetrated': 'is_penetrated',
+        'thrusmoke': 'is_smoke',
+        'attackerinair': 'is_in_air',
+        'attackerblind': 'is_blind',
+        'total_rounds_played': 'round'
+    })
+    deaths = deaths[deaths['attacker_steamid'].notna()]
+    ticks = parser.parse_ticks(["team_name"], ticks=deaths["tick"].to_list())
+
+    def get_team_name(row, ticks, steamid_column):
+        return ticks[(ticks['tick'] == row['tick']) & (ticks['steamid'] == int(row[steamid_column]))]['team_name'].iloc[0]
+
+    deaths['attacker_team_name'] = deaths[deaths['attacker_steamid'].notna()].apply(lambda row: get_team_name(row, ticks, 'attacker_steamid'), axis=1)
+    deaths['assister_team_name'] = deaths[deaths['assister_steamid'].notna()].apply(lambda row: get_team_name(row, ticks, 'assister_steamid'), axis=1)
+    deaths['victim_team_name'] = deaths.apply(lambda row: get_team_name(row, ticks, 'victim_steamid'), axis=1)
+    deaths['weapon'] = 'weapon_' + deaths['weapon']
+    deaths['round'] = deaths['round'] + 1
+    deaths['kill_time'] = deaths["game_time"] - deaths["round_start_time"]
+    deaths['is_penetrated'] = deaths['is_penetrated'] > 0
+
+    return deaths[
+        ['attacker_steamid', 'attacker_team_name',
+         'assister_steamid', 'assister_team_name',
+         'victim_steamid', 'victim_team_name',
+         'weapon', 'tick', 'is_headshot',
+         'is_no_scope', 'is_penetrated',
+         'is_smoke', 'is_in_air',
+         'is_blind', 'round', 'kill_time']
+    ]
+
+
+
 
 parser = DemoParser(r'C:\Projects\Python\diplom\csstats_backend\csstats\files\allweapon.dem')
-# df1 = parser.parse_event('player_death', other=['total_rounds_played'])
-# df2 = parser.parse_event('weapon_fire', other=['total_rounds_played']).rename(columns={
-#         'user_steamid': 'steamid'
-#     })
-# df3 = parser.parse_event('player_hurt', other=['total_rounds_played']).rename(columns={
-#     'attacker_steamid': 'steamid'
-# })
-# df3 = df3[df3['steamid'].notna()]
-# # print(df3.groupby(['weapon']).size())
-# df3 = df3[['tick', 'steamid', 'dmg_health', 'hitgroup', 'total_rounds_played', 'weapon']]
-# # print(df1.groupby(['weapon']).size())
-# # print(df2.groupby(['weapon']).size())
-# df3 = df3.merge(df2, on=['tick', 'steamid', 'total_rounds_played'], how='left', suffixes=['_1', '_2'])
-# print(df3[df3['weapon_1'] == 'knife'])
-# print(df3.groupby(['weapon_1', 'weapon_2'], dropna=False).size())
 
+print(get_start_info(parser).loc[0])
 
 
 def watch_demo(parser: DemoParser = DemoParser(r'C:\Projects\Python\diplom\csstats_backend\csstats\files\spirit-vs-faze-m1-nuke.dem')) -> pd.DataFrame:
@@ -713,6 +790,7 @@ def watch_demo(parser: DemoParser = DemoParser(r'C:\Projects\Python\diplom\cssta
 def get_stats(parser: DemoParser):
     """das."""
     scoreboard = []
+    scoreboard.append(get_rounds_count(parser))
     scoreboard.append(get_kd(parser))
     scoreboard.append(get_clutches(parser))
     scoreboard.append(get_firt_kills_count(parser))
@@ -722,7 +800,6 @@ def get_stats(parser: DemoParser):
     scoreboard.append(get_adr(parser))
     scoreboard.append(get_kast_rounds(parser))
     scoreboard.append(get_multykills(parser))
-    scoreboard.append(get_rounds_count(parser))
 
     result = _merge_many(scoreboard, how='left', on=['steamid', 'team_name', 'equip_value_name', 'equip_value_name_enemy']).fillna(0)
     result = result.merge(get_start_info(parser)[['steamid', 'global_team_name']], how='left', on=['steamid'])
@@ -730,7 +807,7 @@ def get_stats(parser: DemoParser):
     return result
 
 
-#print(get_stats(r'C:\Projects\Python\diplom\csstats_backend\csstats\files\spirit-vs-faze-m1-nuke.dem'))
+# print(get_stats(parser).groupby('steamid')['rounds'].sum().reset_index())
 
 
 

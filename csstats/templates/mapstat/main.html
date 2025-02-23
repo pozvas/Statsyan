@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load django_bootstrap5 %}
+{% block title %}
+  Статистика матча
+{% endblock %}
+{% block content %}
+  <nav>
+    <ul>
+        <li>
+            <a href="{% url 'mapstat:demo' demo.id %}">
+                Статистика
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'mapstat:duels' demo.id %}">
+                Дуэли
+            </a>
+        </li>
+        <li>
+          <a href="{% url 'mapstat:rounds' demo.id %}">
+              Раунды
+          </a>
+        </li>
+    </ul>
+    <div>
+        {% block data %}{% endblock %}
+    </div>
+  </nav>
+{% endblock %}

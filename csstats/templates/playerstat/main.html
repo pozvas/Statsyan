@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load django_bootstrap5 %}
+{% block title %}
+  Статистика игрока
+{% endblock %}
+{% block content %}
+  <nav>
+    <ul>
+        <li>
+            <a href="{% url 'playerstat:matches' player.pk %}">
+                Игры
+            </a>
+        </li>
+    </ul>
+    <div>
+        {% block data %}{% endblock %}
+    </div>
+  </nav>
+{% endblock %}

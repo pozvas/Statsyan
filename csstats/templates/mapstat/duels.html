@@ -1,0 +1,108 @@
+{% extends "mapstat/main.html" %}
+{% block data %}
+    {% load filters %}
+    <style>
+        .thick-border-primary {
+            border-width: 3px !important; /* Толщина границы */
+            border-color: #0d6efd !important; /* Цвет границы (primary) */
+        }
+
+        .thick-border-warning {
+            border-width: 3px !important; /* Толщина границы */
+            border-color: #ffc107 !important; /* Цвет границы (warning) */
+        }
+
+        .avatar {
+            width: 30px; /* Размер аватарки */
+            height: 30px;
+            border-radius: 50%; /* Круглая форма */
+            object-fit: cover; /* Чтобы изображение не искажалось */
+            margin-right: 10px; /* Отступ между аватаркой и именем */
+        }
+
+        .btn-group-toggle .btn {
+            background-color: #ffffff; /* Белый фон */
+            border-color: #cccccc; /* Светло-серый цвет границы */
+            color: #000000; /* Черный цвет текста */
+        }
+
+        .btn-group-toggle .btn.active {
+            background-color: #e9ecef; /* Светло-серый фон для активной кнопки */
+            color: #000000; /* Черный цвет текста для активной кнопки */
+        }
+    </style>
+
+    <script>
+        function toggleMode(mode) {
+            const killsDivs = document.querySelectorAll('.kills');
+            const openKillsDivs = document.querySelectorAll('.open_kills');
+
+            if (mode === 'duel') {
+                killsDivs.forEach(div => div.style.display = 'block');
+                openKillsDivs.forEach(div => div.style.display = 'none');
+            } else if (mode === 'first_duel') {
+                killsDivs.forEach(div => div.style.display = 'none');
+                openKillsDivs.forEach(div => div.style.display = 'block');
+            }
+        }
+    </script>
+
+    <div class="container mt-4">
+        <h1 class="text-center mb-4">Статистика дуэлей</h1>
+        {% if error %}
+            <div class="alert alert-danger" role="alert">
+                {{ error }}
+            </div>
+        {% else %}
+            <div class="btn-group btn-group-toggle mb-3" data-toggle="buttons">
+                <label class="btn">
+                    <input type="radio" name="mode" value="duel" onchange="toggleMode(this.value)" checked> Все
+                </label>
+                <label class="btn">
+                    <input type="radio" name="mode" value="first_duel" onchange="toggleMode(this.value)"> Первые убийства
+                </label>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped table-hover text-center">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">Игрок</th>
+                            {% for player in team_a_players %}
+                                <th scope="col" class="border-bottom thick-border-primary pb-2">
+                                    {% if player.last_avatar %}
+                                        <img src="{{ player.last_avatar }}" alt="Аватар {{ player.last_nickname }}" class="avatar">
+                                    {% endif %}
+                                    {{ player.last_nickname }}
+                                </th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for player_b in team_b_players %}
+                            <tr>
+                                <th scope="row" class="border-bottom thick-border-warning pb-2">
+                                    {% if player_b.last_avatar %}
+                                        <img src="{{ player_b.last_avatar }}" alt="Аватар {{ player_b.last_nickname }}" class="avatar">
+                                    {% endif %}
+                                    {{ player_b.last_nickname }}
+                                </th>
+                                {% for player_a in team_a_players %}
+                                    <td class="align-middle">
+                                        <div class='kills'>
+                                            <span class="border thick-border-warning rounded px-2">{{ duel_stats|get_value_from_dict:player_b.pk|get_value_from_dict:player_a.pk|get_or_else:default_kills|get_value_from_dict:'kills' }}</span>:
+                                            <span class="border thick-border-primary rounded px-2">{{ duel_stats|get_value_from_dict:player_a.pk|get_value_from_dict:player_b.pk|get_or_else:default_kills|get_value_from_dict:'kills' }}</span>
+                                        </div>  
+                                        <div class='open_kills' style='display:none'>
+                                            <span class="border thick-border-warning rounded px-2">{{ duel_stats|get_value_from_dict:player_b.pk|get_value_from_dict:player_a.pk|get_or_else:default_kills|get_value_from_dict:'open_kills' }}</span>:
+                                            <span class="border thick-border-primary rounded px-2">{{ duel_stats|get_value_from_dict:player_a.pk|get_value_from_dict:player_b.pk|get_or_else:default_kills|get_value_from_dict:'open_kills' }}</span>
+                                        </div>  
+                                    </td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

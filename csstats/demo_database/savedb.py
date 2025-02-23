@@ -1,10 +1,11 @@
 from pandas import DataFrame
 from demoparser2 import DemoParser
-from demoparser.demoparser import get_duels, get_start_info, get_max_tick, get_stats, get_weapon_stat
-from .models import Player, Demo, ScoreBoard, Duels, Map, MatchType, PlayerInDemo, MMRank, Side, BuyType, Weapon, PlayerWeaponStat, PlayerHitgroupStat, HitGroup
+from demoparser.demoparser import get_duels, get_start_info, get_max_tick, get_stats, get_weapon_stat, get_rounds, get_kills_in_round
+from .models import Player, Demo, ScoreBoard, Duels, Map, MatchType, PlayerInDemo, MMRank, Side, BuyType, Weapon, PlayerWeaponStat, PlayerHitgroupStat, HitGroup, Round, WinReason, KillsInRound
 from hashlib import sha256
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
+from steam.steamapi import get_players_names_and_avatars
 
 
 def save_stats(df: DataFrame):
@@ -14,8 +15,8 @@ def save_stats(df: DataFrame):
         player, created = Player.objects.get_or_create(steamid=row['steamid'])
 
         scoreboard = ScoreBoard(
-            player_id=player,
-            demo_id=demo,
+            player=player,
+            demo=demo,
             side=row['team_name'],
             team=row['global_team_name'],
             kills=row['kills'],
@@ -41,6 +42,19 @@ def save_stats(df: DataFrame):
     return demo.pk
 
 
+def update_players_info(steamids=None):
+    if steamids is None:
+        steamids = Player.objects.values_list('pk', flat=True)
+
+    players_data = get_players_names_and_avatars(steamids)
+    for player_data in players_data:
+        with transaction.atomic():
+            player = Player.objects.get(pk=player_data['steamid'])
+            player.last_avatar = player_data['avatar']
+            player.last_nickname = player_data['personaname']
+            player.save()
+
+
 def save_demo(path: str):
     parser = DemoParser(path)
     info = get_start_info(parser)
@@ -52,9 +66,9 @@ def save_demo(path: str):
     ]
     string = '|'.join(list_data)
 
-    hash_id = sha256(string.encode()).hexdigest()
+    hash = sha256(string.encode()).hexdigest()
 
-    demo = Demo.objects.filter(hash_id=hash_id).first()
+    demo = Demo.objects.filter(hash=hash).first()
 
     if demo is not None:
         return demo.pk
@@ -67,15 +81,18 @@ def save_demo(path: str):
     duels = get_duels(parser)
     scoreboard = get_stats(parser)
     (weapon_fires, weapon_hurt) = get_weapon_stat(parser)
+    rounds = get_rounds(parser)
+    kills_in_round = get_kills_in_round(parser)
+    del parser
 
     with transaction.atomic():
         demo = Demo.objects.create(
-            hash_id=hash_id,
+            hash=hash,
             win_team=None if is_tie else info[info['is_win']].reset_index(drop=True).loc[0, 'global_team_name'],
             score_win=info[(info['is_win']) | (info['is_tie'])].reset_index(drop=True).loc[0, 'team_rounds_total'],
             score_lose=info[~(info['is_win']) | (info['is_tie'])].reset_index(drop=True).loc[0, 'team_rounds_total'],
-            map_id=map,
-            match_type_id=match_type
+            map=map,
+            match_type=match_type
         )
 
         for _, row in info.iterrows():
@@ -83,13 +100,13 @@ def save_demo(path: str):
             rank = None if match_type.is_elo else MMRank.objects.get(code=row['rank'])
             new_elo = row['rank_if_win'] if row['is_win'] else row['rank_if_tie'] if row['is_tie'] else row['rank_if_loss']
             player_in_demo = PlayerInDemo.objects.create(
-                player_id=player,
-                demo_id=demo,
+                player=player,
+                demo=demo,
                 team=row['global_team_name'],
                 crosshair_code=row['crosshair_code'],
                 elo_old=row['rank'] if match_type.is_elo else None,
                 elo_new=new_elo if match_type.is_elo else None,
-                rang_id=rank
+                rang=rank
             )
 
             for _, row2 in scoreboard[scoreboard['steamid'] == player.steamid].iterrows():
@@ -103,10 +120,10 @@ def save_demo(path: str):
                     / row2['rounds'] + 0.2372 * impact + 0.1587)
 
                 ScoreBoard.objects.create(
-                    player_in_demo_id=player_in_demo,
-                    side_id=side,
-                    buy_type_id=buy_type,
-                    enemy_buy_type_id=buy_type_enemy,
+                    player_in_demo=player_in_demo,
+                    side=side,
+                    buy_type=buy_type,
+                    enemy_buy_type=buy_type_enemy,
                     rounds=row2['rounds'],
                     kills=row2['kills'],
                     assists=row2['assists'],
@@ -141,9 +158,9 @@ def save_demo(path: str):
             attacker, _ = Player.objects.get_or_create(steamid=row['attacker_steamid'])
             victim, _ = Player.objects.get_or_create(steamid=row['victim_steamid'])
             Duels.objects.create(
-                demo_id=demo,
-                attacker_player_id=attacker,
-                victim_player_id=victim,
+                demo=demo,
+                attacker_player=attacker,
+                victim_player=victim,
                 kills=row['duels'],
                 open_kills=row['open_duels']
             )
@@ -151,13 +168,12 @@ def save_demo(path: str):
         for _, row in weapon_fires.iterrows():
             player, _ = Player.objects.get_or_create(steamid=row['steamid'])
             side = Side.objects.get(name=row['team_name'])
-            print(row['weapon'])
             weapon = Weapon.objects.get(name=row['weapon'])
             weapon_stat = PlayerWeaponStat.objects.create(
-                demo_id=demo,
-                player_id=player,
-                side_id=side,
-                weapon_id=weapon,
+                demo=demo,
+                player=player,
+                side=side,
+                weapon=weapon,
                 fires_count=row['fires_count']
             )
             for _, row2 in weapon_hurt[
@@ -167,13 +183,58 @@ def save_demo(path: str):
             ].iterrows():
                 hit_group = HitGroup.objects.get(name=row2['hitgroup'])
                 PlayerHitgroupStat.objects.create(
-                    player_weapon_stat_id=weapon_stat,
-                    hit_group_id=hit_group,
+                    player_weapon_stat=weapon_stat,
+                    hit_group=hit_group,
                     damage=row2['damage'],
                     hits=row2['hits_count'],
                     kills=row2['kills_count']
                 )
 
+        for _, row in rounds.iterrows():
+            buy_type_t = BuyType.objects.get(name=row['equip_value_name_t'])
+            buy_type_ct = BuyType.objects.get(name=row['equip_value_name_ct'])
+            win_reason = WinReason.objects.get(code=row['round_win_reason'])   
+            round = Round.objects.create(
+                demo=demo,
+                round_number=row['total_rounds_played'],
+                win_reason=win_reason,
+                ct_buy_type=buy_type_ct,
+                ct_buy_sum=row['equip_value_sum_ct'],
+                ct_buy_avg_sum=row['equip_value_ct'],
+                ct_team_name=row['global_team_name_ct'],
+                t_buy_type=buy_type_t,
+                t_buy_sum=row['equip_value_sum_t'],
+                t_buy_avg_sum=row['equip_value_t'],
+                t_team_name=row['global_team_name_t'],
+            )
+            for _, row2 in kills_in_round[kills_in_round['round'] == row['total_rounds_played']].iterrows():
+                attacker = Player.objects.filter(steamid=row2['attacker_steamid']).first()
+                attacker_side = Side.objects.filter(name=row2['attacker_team_name']).first()
+                assister = Player.objects.filter(steamid=row2['assister_steamid']).first()
+                assister_side = Side.objects.filter(name=row2['assister_team_name']).first()
+                victim = Player.objects.get(steamid=row2['victim_steamid'])
+                victim_side = Side.objects.get(name=row2['victim_team_name'])
+                weapon = Weapon.objects.filter(name=row2['weapon']).first()
+                KillsInRound.objects.create(
+                    round=round,
+                    attacker=attacker,
+                    attacker_side=attacker_side,
+                    assister=assister,
+                    assister_side = assister_side,
+                    victim = victim,
+                    victim_side = victim_side,
+                    weapon = weapon,
+                    is_headshot = row2['is_headshot'],
+                    is_penetrated = row2['is_penetrated'],
+                    is_in_air = row2['is_in_air'],
+                    is_blind = row2['is_blind'],
+                    is_smoke = row2['is_smoke'],
+                    is_no_scope = row2['is_no_scope'],
+                    tick = row2['tick'],
+                    kill_time = row2['kill_time'],
+                )
+
+        update_players_info()
         return demo.pk
 
     # except ObjectDoesNotExist:

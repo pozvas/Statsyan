@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load django_bootstrap5 %}
+{% block title %}
+  Загрузка дем-файла
+{% endblock %}
+{% block content %}
+  <div class="col d-flex justify-content-center">
+    <h1>Загрузка дем-файла</h1>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="file" name="file">
+        <button type="submit">Загрузить</button>
+    </form>
+  </div>
+{% endblock %}
