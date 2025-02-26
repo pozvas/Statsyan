@@ -3,14 +3,16 @@
         "model": "demo_database.Side",
         "pk": 1,
         "fields": {
-            "name": "CT"
+            "code": "CT",
+            "name": "Спецназ"
         }
     },
     {
         "model": "demo_database.Side",
         "pk": 2,
         "fields": {
-            "name": "TERRORIST"
+            "code": "TERRORIST",
+            "name": "Террористы"
         }
     },
     {
@@ -263,7 +265,8 @@
         "model": "demo_database.BuyType",
         "pk": 1,
         "fields": {
-            "name": "pistol",
+            "code": "pistol",
+            "name": "Пистолеты",
             "equipment_value_from": 0,
             "equipment_value_to": 0,
             "is_pistol": 1
@@ -273,27 +276,8 @@
         "model": "demo_database.BuyType",
         "pk": 2,
         "fields": {
-            "name": "force",
-            "equipment_value_from": 1001,
-            "equipment_value_to": 2000,
-            "is_pistol": 0
-        }
-    },
-    {
-        "model": "demo_database.BuyType",
-        "pk": 3,
-        "fields": {
-            "name": "semi_buy",
-            "equipment_value_from": 2001,
-            "equipment_value_to": 4000,
-            "is_pistol": 0
-        }
-    },
-    {
-        "model": "demo_database.BuyType",
-        "pk": 4,
-        "fields": {
-            "name": "eco",
+            "code": "eco",
+            "name": "Экономическая закупка",
             "equipment_value_from": 0,
             "equipment_value_to": 1000,
             "is_pistol": 0
@@ -301,9 +285,32 @@
     },
     {
         "model": "demo_database.BuyType",
+        "pk": 3,
+        "fields": {
+            "code": "force",
+            "name": "Форс",
+            "equipment_value_from": 1001,
+            "equipment_value_to": 2000,
+            "is_pistol": 0
+        }
+    },
+    {
+        "model": "demo_database.BuyType",
+        "pk": 4,
+        "fields": {
+            "code": "semi_buy",
+            "name": "Неполная закупка",
+            "equipment_value_from": 2001,
+            "equipment_value_to": 4000,
+            "is_pistol": 0
+        }
+    },
+    {
+        "model": "demo_database.BuyType",
         "pk": 5,
         "fields": {
-            "name": "full_buy",
+            "code": "full_buy",
+            "name": "Полная закупка",
             "equipment_value_from": 4001,
             "equipment_value_to": 160000,
             "is_pistol": 0

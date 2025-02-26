@@ -1,125 +1,169 @@
 {% extends "mapstat/main.html" %}
 {% load django_bootstrap5 %}
 {% block data %}
-    <h1>Scoreboard for Demo {{ demo.pk }}</h1>
+    <div class="container mt-4">
+        <h1 class="mb-4 text-center">Статистика матча</h1>
 
-    <form method="GET" action="">
-        <label for="side">Filter by Side:</label>
-        <select id="side" name="side">
-            <option value="">All</option>
-            {% for side in sides %}
-                <option value="{{ side.id }}" {% if request.GET.side == side.id|stringformat:"s" %}selected{% endif %}>{{ side.name }}</option>
+        <form method="GET" action="" class="mb-4">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label for="side" class="form-label">Фильтр по стороне:</label>
+                    <select id="side" name="side" class="form-select">
+                        <option value="">Всё</option>
+                        {% for side in sides %}
+                            <option value="{{ side.id }}" {% if request.GET.side == side.id|stringformat:"s" %}selected{% endif %}>{{ side.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="buy_type" class="form-label">Фильтр по типу закупки:</label>
+                    <select id="buy_type" name="buy_type" class="form-select">
+                        <option value="">Всё</option>
+                        {% for buy_type in buy_types %}
+                            <option value="{{ buy_type.id }}" {% if request.GET.buy_type == buy_type.id|stringformat:"s" %}selected{% endif %}>{{ buy_type.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="enemy_buy_type" class="form-label">Фильтр по типу закупки оппонента:</label>
+                    <select id="enemy_buy_type" name="enemy_buy_type" class="form-select">
+                        <option value="">Всё</option>
+                        {% for buy_type in buy_types %}
+                            <option value="{{ buy_type.id }}" {% if request.GET.enemy_buy_type == buy_type.id|stringformat:"s" %}selected{% endif %}>{{ buy_type.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary mt-3">Применить</button>
+        </form>
+        <div class="table-responsive">
+            {% for team_name in teams_name %}
+                <div class="row mb-4">
+                    <div class="col-md-12">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th colspan=7/>
+                                    <th class='clutch-header text-center click' colspan=1 onClick="toggleColumns('clutch', 5)">
+                                        <div class='d-flex flex-column align-items-center'>
+                                            <i class="bi bi-arrows"></i>
+                                            1vX
+                                        </div>
+                                    </th>
+                                    <th class='mk-header text-center click' colspan=1 onClick="toggleColumns('mk', 5)">
+                                        <div class='d-flex flex-column align-items-center'>
+                                            <i class="bi bi-arrows"></i>
+                                            3k+
+                                        </div>
+                                    </th>
+                                    <th class='first-duel-header text-center click' colspan=1 onClick="toggleColumns('first-duel', 2)">
+                                        <div class='d-flex flex-column align-items-center'>
+                                            <i class="bi bi-arrows"></i>
+                                            First duels
+                                        </div>
+                                    </th>
+                                    <th class='utility-header text-center click' colspan=1 onClick="toggleColumns('utility', 3)">
+                                        <div class='d-flex flex-column align-items-center'>
+                                            <i class="bi bi-arrows"></i>
+                                            Utility
+                                        </div>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th style="min-width: 300px;" class="text-center">{{ team_name }}</th>
+                                    <th data-toggle="popover" title="Убийства" class="text-center">K</th>
+                                    <th class="text-center" data-toggle="popover" title="Помощи" >A</th>
+                                    <th class="text-center" data-toggle="popover" title="Смерти" >D</th>
+                                    <th class="text-center" data-toggle="popover" title="Средний урон за раунд" >ADR</th>
+                                    <th class="text-center" data-toggle="popover" title="Процент раундов с убийством, помощью, выживанием и разменом" >KAST</th>
+                                    <th class="text-center" data-toggle="popover" title="HLTV Rating 2.0" >Rating</th>
+                                    <th class='clutch-main text-center'>1vX</th>
+                                    <th class='clutch invisible text-center'>1x1</th>
+                                    <th class='clutch invisible text-center'>1x2</th>
+                                    <th class='clutch invisible text-center'>1x3</th>
+                                    <th class='clutch invisible text-center'>1x4</th>
+                                    <th class='clutch invisible text-center'>1x5</th>
+                                    <th class='mk-main text-center'>3k+</th>
+                                    <th class='mk invisible text-center'>1k</th>
+                                    <th class='mk invisible text-center'>2k</th>
+                                    <th class='mk invisible text-center'>3k</th>
+                                    <th class='mk invisible text-center'>4k</th>
+                                    <th class='mk invisible text-center'>5k</th>
+                                    <th class='first-duel-main text-center'>FKD</th>
+                                    <th class='first-duel invisible text-center'>FK</th>
+                                    <th class='first-duel invisible text-center'>FD</th>
+                                    <th class='utility-main text-center'>EF</th>
+                                    <th class='utility invisible text-center'>UD</th>
+                                    <th class='utility invisible text-center'>EF</th>
+                                    <th class='utility invisible text-center'>FA</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for player_in_demo in players_in_demo %}
+                                    {% if player_in_demo.team == team_name %}
+                                        <tr>
+                                            <td style="min-width: 150px;">
+                                                {% if player_in_demo.player.last_avatar %}
+                                                    <img src="{{ player_in_demo.player.last_avatar }}" alt="Аватар {{ player_in_demo.player.last_nickname }}" class="avatar"/>
+                                                {% endif %}
+                                                <a href="{% url 'playerstat:matches' player_in_demo.player.pk %}" class="text-reset text-decoration-none">{{ player_in_demo.player.last_nickname }}</a>
+                                            </td>
+                                            <td class="text-center">{{ player_in_demo.kills }}</td>
+                                            <td class="text-center">{{ player_in_demo.assists }}</td>
+                                            <td class="text-center">{{ player_in_demo.deaths }}</td>
+                                            <td class="text-center">{{ player_in_demo.adr|floatformat:1 }}</td>
+                                            <td class="text-center">{{ player_in_demo.kast|floatformat:1 }}%</td>
+                                            <td class="text-center">{{ player_in_demo.rating|floatformat:2 }}</td>
+                                            <td class='clutch-main text-center'>{{ player_in_demo.all_win_clutches }}</td>
+                                            <td class='clutch invisible text-center'>{{ player_in_demo.win_clutches_1x1 }}</td>
+                                            <td class='clutch invisible text-center'>{{ player_in_demo.win_clutches_1x2 }}</td>
+                                            <td class='clutch invisible text-center'>{{ player_in_demo.win_clutches_1x3 }}</td>
+                                            <td class='clutch invisible text-center'>{{ player_in_demo.win_clutches_1x4 }}</td>
+                                            <td class='clutch invisible text-center'>{{ player_in_demo.win_clutches_1x5 }}</td>
+                                            <td class='mk-main text-center'>{{ player_in_demo.kills_3_over }}</td>
+                                            <td class='mk invisible text-center'>{{ player_in_demo.kills_1 }}</td>
+                                            <td class='mk invisible text-center'>{{ player_in_demo.kills_2 }}</td>
+                                            <td class='mk invisible text-center'>{{ player_in_demo.kills_3 }}</td>
+                                            <td class='mk invisible text-center'>{{ player_in_demo.kills_4 }}</td>
+                                            <td class='mk invisible text-center'>{{ player_in_demo.kills_5 }}</td>
+                                            <td class='first-duel-main text-center'>{{ player_in_demo.first_kills_dif }}</td>
+                                            <td class='first-duel invisible text-center'>{{ player_in_demo.first_kills }}</td>
+                                            <td class='first-duel invisible text-center'>{{ player_in_demo.first_deaths }}</td>
+                                            <td class='utility-main text-center'>{{ player_in_demo.enemy_flashed }}</td>
+                                            <td class='utility invisible text-center'>{{ player_in_demo.utility_damage }}</td>
+                                            <td class='utility invisible text-center'>{{ player_in_demo.enemy_flashed }}</td>
+                                            <td class='utility invisible text-center'>{{ player_in_demo.flash_assists }}</td>
+                                        </tr>
+                                    {% endif %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             {% endfor %}
-        </select>
+        </div>
+    </div>
+    <script>
+        function toggleColumns(name, numCol) {
+          const columns = document.querySelectorAll('.' + name);
+          const columnsMain = document.querySelectorAll('.' + name + '-main');
 
-        <label for="buy_type">Filter by Buy Type:</label>
-        <select id="buy_type" name="buy_type">
-            <option value="">All</option>
-            {% for buy_type in buy_types %}
-                <option value="{{ buy_type.id }}" {% if request.GET.buy_type == buy_type.id|stringformat:"s" %}selected{% endif %}>{{ buy_type.name }}</option>
-            {% endfor %}
-        </select>
+          columns.forEach(column => {
+            column.classList.toggle('invisible');
+          });
+          columnsMain.forEach(column => {
+            column.classList.toggle('invisible');
+          });
 
-        <label for="enemy_buy_type">Filter by Enemy Buy Type:</label>
-        <select id="enemy_buy_type" name="enemy_buy_type">
-            <option value="">All</option>
-            {% for buy_type in buy_types %}
-                <option value="{{ buy_type.id }}" {% if request.GET.enemy_buy_type == buy_type.id|stringformat:"s" %}selected{% endif %}>{{ buy_type.name }}</option>
-            {% endfor %}
-        </select>
-
-        <button type="submit">Filter</button>
-    </form>
-
-    <h2>Player Statistics</h2>
-    {% for team_name in teams_name %}
-        <h3> {{ team_name }} </h3>
-        <h4> 
-            {% if demo.win_team == team_name %} {{ demo.score_win }} {% else %} {{ demo.score_lose }} {% endif %}
-        </h4>
-        {% if demo.win_team == team_name %}
-            <p> 
-                Победитель 
-            </p>
-        {% endif %}
-        <table>
-            <thead>
-                <tr>
-                    <th>Player</th>
-                    <th>ELO Old</th>
-                    <th>ELO New</th>
-                    <th>Rank</th>
-                    <th>Rounds</th>
-                    <th>Kills</th>
-                    <th>Assists</th>
-                    <th>Deaths</th>
-                    <th>Damage</th>
-                    <th>KAST Rounds</th>
-                    <th>Win Clutches 1x1</th>
-                    <th>Win Clutches 1x2</th>
-                    <th>Win Clutches 1x3</th>
-                    <th>Win Clutches 1x4</th>
-                    <th>Win Clutches 1x5</th>
-                    <th>Loss Clutches 1x1</th>
-                    <th>Loss Clutches 1x2</th>
-                    <th>Loss Clutches 1x3</th>
-                    <th>Loss Clutches 1x4</th>
-                    <th>Loss Clutches 1x5</th>
-                    <th>Kills 1</th>
-                    <th>Kills 2</th>
-                    <th>Kills 3</th>
-                    <th>Kills 4</th>
-                    <th>Kills 5</th>
-                    <th>First Kills</th>
-                    <th>First Deaths</th>
-                    <th>Utility Damage</th>
-                    <th>Enemy Flashed</th>
-                    <th>Flash Assists</th>
-                    <th>Impact</th>
-                    <th>Rating</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for player_in_demo in players_in_demo %}
-                    {% if player_in_demo.team == team_name %}
-                        <tr>
-                            <td>{{ player_in_demo.player.last_nickname }}</td>
-                            <td>{{ player_in_demo.elo_old }}</td>
-                            <td>{{ player_in_demo.elo_new }}</td>
-                            <td>{{ player_in_demo.rang.name }}</td>
-                            <td>{{ player_in_demo.rounds }}</td>
-                            <td>{{ player_in_demo.kills }}</td>
-                            <td>{{ player_in_demo.assists }}</td>
-                            <td>{{ player_in_demo.deaths }}</td>
-                            <td>{{ player_in_demo.damage }}</td>
-                            <td>{{ player_in_demo.kast_rounds }}</td>
-                            <td>{{ player_in_demo.win_clutches_1x1 }}</td>
-                            <td>{{ player_in_demo.win_clutches_1x2 }}</td>
-                            <td>{{ player_in_demo.win_clutches_1x3 }}</td>
-                            <td>{{ player_in_demo.win_clutches_1x4 }}</td>
-                            <td>{{ player_in_demo.win_clutches_1x5 }}</td>
-                            <td>{{ player_in_demo.loss_clutches_1x1 }}</td>
-                            <td>{{ player_in_demo.loss_clutches_1x2 }}</td>
-                            <td>{{ player_in_demo.loss_clutches_1x3 }}</td>
-                            <td>{{ player_in_demo.loss_clutches_1x4 }}</td>
-                            <td>{{ player_in_demo.loss_clutches_1x5 }}</td>
-                            <td>{{ player_in_demo.kills_1 }}</td>
-                            <td>{{ player_in_demo.kills_2 }}</td>
-                            <td>{{ player_in_demo.kills_3 }}</td>
-                            <td>{{ player_in_demo.kills_4 }}</td>
-                            <td>{{ player_in_demo.kills_5 }}</td>
-                            <td>{{ player_in_demo.first_kills }}</td>
-                            <td>{{ player_in_demo.first_deaths }}</td>
-                            <td>{{ player_in_demo.utility_damage }}</td>
-                            <td>{{ player_in_demo.enemy_flashed }}</td>
-                            <td>{{ player_in_demo.flash_assists }}</td>
-                            <td>{{ player_in_demo.impact|floatformat:2 }}</td>
-                            <td>{{ player_in_demo.rating|floatformat:2}}</td>
-                            <td colspan="28"></td>
-                        </tr>
-                    {% endif %}
-                {% endfor %}
-            </tbody>
-        </table>
-    {% endfor %}
+          const columnsHeader = document.querySelectorAll('.' + name + '-header');
+          columnsHeader.forEach(column => {
+            if (columns[0].classList.contains('invisible')) {
+                column.colSpan = 1; 
+            } else {
+                column.colSpan = numCol;
+            }
+          })
+            
+        }
+      </script>
 {% endblock %}

@@ -110,9 +110,9 @@ def save_demo(path: str):
             )
 
             for _, row2 in scoreboard[scoreboard['steamid'] == player.steamid].iterrows():
-                side = Side.objects.get(name=row2['team_name'])
-                buy_type = BuyType.objects.get(name=row2['equip_value_name'])
-                buy_type_enemy = BuyType.objects.get(name=row2['equip_value_name_enemy'])
+                side = Side.objects.get(code=row2['team_name'])
+                buy_type = BuyType.objects.get(code=row2['equip_value_name'])
+                buy_type_enemy = BuyType.objects.get(code=row2['equip_value_name_enemy'])
                 impact = (2.13 * row2['kills'] + 0.42 * row2['assists']) / row2['rounds'] - 0.41
                 rating = (
                     (0.73 * row2['kast_rounds'] + 0.3591 * row2['kills']
@@ -167,7 +167,7 @@ def save_demo(path: str):
 
         for _, row in weapon_fires.iterrows():
             player, _ = Player.objects.get_or_create(steamid=row['steamid'])
-            side = Side.objects.get(name=row['team_name'])
+            side = Side.objects.get(code=row['team_name'])
             weapon = Weapon.objects.get(name=row['weapon'])
             weapon_stat = PlayerWeaponStat.objects.create(
                 demo=demo,
@@ -191,8 +191,8 @@ def save_demo(path: str):
                 )
 
         for _, row in rounds.iterrows():
-            buy_type_t = BuyType.objects.get(name=row['equip_value_name_t'])
-            buy_type_ct = BuyType.objects.get(name=row['equip_value_name_ct'])
+            buy_type_t = BuyType.objects.get(code=row['equip_value_name_t'])
+            buy_type_ct = BuyType.objects.get(code=row['equip_value_name_ct'])
             win_reason = WinReason.objects.get(code=row['round_win_reason'])   
             round = Round.objects.create(
                 demo=demo,
@@ -209,11 +209,11 @@ def save_demo(path: str):
             )
             for _, row2 in kills_in_round[kills_in_round['round'] == row['total_rounds_played']].iterrows():
                 attacker = Player.objects.filter(steamid=row2['attacker_steamid']).first()
-                attacker_side = Side.objects.filter(name=row2['attacker_team_name']).first()
+                attacker_side = Side.objects.filter(code=row2['attacker_team_name']).first()
                 assister = Player.objects.filter(steamid=row2['assister_steamid']).first()
-                assister_side = Side.objects.filter(name=row2['assister_team_name']).first()
+                assister_side = Side.objects.filter(code=row2['assister_team_name']).first()
                 victim = Player.objects.get(steamid=row2['victim_steamid'])
-                victim_side = Side.objects.get(name=row2['victim_team_name'])
+                victim_side = Side.objects.get(code=row2['victim_team_name'])
                 weapon = Weapon.objects.filter(name=row2['weapon']).first()
                 KillsInRound.objects.create(
                     round=round,

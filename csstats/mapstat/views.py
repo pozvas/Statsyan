@@ -49,24 +49,43 @@ class DemoScoreBoardView(DemoMixin, ListView):
                 assists=Sum('scoreboard__assists'),
                 deaths=Sum('scoreboard__deaths'),
                 damage=Sum('scoreboard__damage'),
+                adr=(
+                    Sum('scoreboard__damage') * 1.0
+                    / Sum('scoreboard__rounds')
+                ),
                 kast_rounds=Sum('scoreboard__kast_rounds'),
+                kast=(
+                    Sum('scoreboard__kast_rounds') * 100.0
+                    / Sum('scoreboard__rounds')
+                ),
                 win_clutches_1x1=Sum('scoreboard__win_clutches_1x1'),
                 win_clutches_1x2=Sum('scoreboard__win_clutches_1x2'),
                 win_clutches_1x3=Sum('scoreboard__win_clutches_1x3'),
                 win_clutches_1x4=Sum('scoreboard__win_clutches_1x4'),
                 win_clutches_1x5=Sum('scoreboard__win_clutches_1x5'),
-                loss_clutches_1x1=Sum('scoreboard__loss_clutches_1x1'),
-                loss_clutches_1x2=Sum('scoreboard__loss_clutches_1x2'),
-                loss_clutches_1x3=Sum('scoreboard__loss_clutches_1x3'),
-                loss_clutches_1x4=Sum('scoreboard__loss_clutches_1x4'),
-                loss_clutches_1x5=Sum('scoreboard__loss_clutches_1x5'),
+                all_win_clutches=(
+                    Sum('scoreboard__win_clutches_1x1') +
+                    Sum('scoreboard__win_clutches_1x2') +
+                    Sum('scoreboard__win_clutches_1x3') +
+                    Sum('scoreboard__win_clutches_1x4') +
+                    Sum('scoreboard__win_clutches_1x5')
+                ),
                 kills_1=Sum('scoreboard__kills_1'),
                 kills_2=Sum('scoreboard__kills_2'),
                 kills_3=Sum('scoreboard__kills_3'),
                 kills_4=Sum('scoreboard__kills_4'),
                 kills_5=Sum('scoreboard__kills_5'),
+                kills_3_over=(
+                    Sum('scoreboard__kills_3') +
+                    Sum('scoreboard__kills_4') + 
+                    Sum('scoreboard__kills_5')
+                ),
                 first_kills=Sum('scoreboard__first_kills'),
                 first_deaths=Sum('scoreboard__first_deaths'),
+                first_kills_dif=(
+                    Sum('scoreboard__first_kills') -
+                    Sum('scoreboard__first_deaths')
+                ),
                 utility_damage=Sum('scoreboard__utility_damage'),
                 enemy_flashed=Sum('scoreboard__enemy_flashed'),
                 flash_assists=Sum('scoreboard__flash_assists'),
@@ -91,6 +110,7 @@ class DemoScoreBoardView(DemoMixin, ListView):
                             ) / Sum('scoreboard__rounds') - 0.41
                         ) + 0.1587),
             )
+            .order_by('-rating')
         )
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:

@@ -10,6 +10,7 @@ class Player(models.Model):
 
 
 class Side(models.Model):
+    code = models.CharField(max_length=32)
     name = models.CharField(max_length=32)
 
 
@@ -30,6 +31,7 @@ class WinReason(models.Model):
 
 
 class BuyType(models.Model):
+    code = models.CharField(max_length=32)
     name = models.CharField(max_length=32)
     equipment_value_from = models.IntegerField()
     equipment_value_to = models.IntegerField()
