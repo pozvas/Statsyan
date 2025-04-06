@@ -1,0 +1,125 @@
+{% extends "playerstat/main.html" %}
+{% load django_bootstrap5 %}
+{% block data %}
+<div class="container mt-4">
+    <!-- Заголовок и основная информация -->
+    <div class="text-center mb-4">
+        <h1 class="display-4">{{ player.name }}</h1>
+        <p class="lead">Rank: {{ player.rank }}</p>
+        <p class="lead">Best Map: {{ player_stat.best_map }}</p>
+    </div>
+
+    <!-- Основная статистика -->
+    <div class="row mb-4">
+        <!-- K/D и HLTV Rating -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h2 class="card-title">K/D</h2>
+                    <p class="card-text display-6">{{ player_stat.kills|floatformat:2 }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h2 class="card-title">HLTV Rating</h2>
+                    <p class="card-text display-6">{{ player_stat.rating|floatformat:2 }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Clutch Success -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h2 class="card-title">Clutch Success</h2>
+            <div class="row">
+                <div class="col-md-2">
+                    <p class="mb-1">1v1: {{ player_stat.win_clutches_1x1 }} ({{ player_stat.win_clutches_1x1_percentage }}%)</p>
+                </div>
+                <div class="col-md-2">
+                    <p class="mb-1">1v2: {{ player_stat.win_clutches_1x2 }} ({{ player_stat.win_clutches_1x2_percentage }}%)</p>
+                </div>
+                <div class="col-md-2">
+                    <p class="mb-1">1v3: {{ player_stat.win_clutches_1x3 }} ({{ player_stat.win_clutches_1x3_percentage }}%)</p>
+                </div>
+                <div class="col-md-2">
+                    <p class="mb-1">1v4: {{ player_stat.win_clutches_1x4 }} ({{ player_stat.win_clutches_1x4_percentage }}%)</p>
+                </div>
+                <div class="col-md-2">
+                    <p class="mb-1">1v5: {{ player_stat.win_clutches_1x5 }} ({{ player_stat.win_clutches_1x5_percentage }}%)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Matches -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h2 class="card-title">Matches</h2>
+            <div class="row">
+                <div class="col-md-6">
+                    <h3>Most Played</h3>
+                    <ul class="list-group">
+                        {% for map in player_stat.most_played_maps %}
+                            <li class="list-group-item">{{ map.name }}: {{ map.played_count }} matches</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h3>Most Success</h3>
+                    <ul class="list-group">
+                        {% for map in player_stat.most_successful_maps %}
+                            <li class="list-group-item">{{ map.name }}: {{ map.success_rate }}%</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Entry Success -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h2 class="card-title">Entry Success</h2>
+            <p class="lead">Entry Success per Round: {{ player_stat.entry_success_per_round }}%</p>
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-1">T Entries: {{ player_stat.t_entries_success }}%</p>
+                </div>
+                <div class="col-md-6">
+                    <p class="mb-1">CT Entries: {{ player_stat.ct_entries_success }}%</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Performance -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h2 class="card-title">Performance</h2>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="performance-stats">
+                        <p class="mb-1">Win Rate: {{ player_stat.win_rate }}%</p>
+                        <p class="mb-1">HS%: {{ player_stat.headshot_percentage }}%</p>
+                        <p class="mb-1">ADR: {{ player_stat.adr }}</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <p class="mb-1">Played: {{ player_stat.demos_count }}</p>
+                    <p class="mb-1">Won: {{ player_stat.win_count }}</p>
+                    <p class="mb-1">Lost: {{ player_stat.lost_count }}</p>
+                    <p class="mb-1">Tied: {{ player_stat.tied_count }}</p>
+                    <p class="mb-1">Kills: {{ player_stat.kills }}</p>
+                    <p class="mb-1">Deaths: {{ player_stat.deaths }}</p>
+                    <p class="mb-1">Assists: {{ player_stat.assists }}</p>
+                    <p class="mb-1">Damage: {{ player_stat.damage }}</p>
+                    <p class="mb-1">Rounds: {{ player_stat.rounds }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

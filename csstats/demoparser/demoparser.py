@@ -755,8 +755,9 @@ def get_kills_in_round(parser: DemoParser) -> pd.DataFrame:
 
 
 parser = DemoParser(r'C:\Projects\Python\diplom\csstats_backend\csstats\files\allweapon.dem')
+info = get_start_info(parser)
 
-# print(get_start_info(parser).loc[0])
+# print(info[~(info['is_win']) | (info['is_tie'])].reset_index(drop=True).loc[0])
 
 
 def watch_demo(parser: DemoParser = DemoParser(r'C:\Projects\Python\diplom\csstats_backend\csstats\files\spirit-vs-faze-m1-nuke.dem')) -> pd.DataFrame:

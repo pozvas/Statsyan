@@ -16,11 +16,15 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
+from steam.views import Main, logout_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', Main.as_view(), name='home'),
     path('demo/', include('mapstat.urls')),
-    path('player/', include('playerstat.urls'))
+    path('player/', include('playerstat.urls')),
+    path('social-auth/', include('social_django.urls', namespace='social')),
+    path('logout/', logout_view, name='logout'),
 ]
 
 # Если проект запущен в режиме разработки...

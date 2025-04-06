@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% load django_bootstrap5 %}
+{% block title %}
+  Получение кода аунтефикации
+{% endblock %}
+{% block content %}
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="{{ form.auth_code.id_for_label }}">Код аунтефикации</label>
+        {{ form.auth_code }}
+        {{ form.auth_code.errors }}
+    </div>
+    <button type="submit">Отправить</button>
+  </form>
+{% endblock %}

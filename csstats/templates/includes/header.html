@@ -4,5 +4,16 @@
     <div class="container">
       Заголовок
     </div>
+    <div>
+      {% if user.is_authenticated %}
+          {% if steam_player.last_avatar %}
+              <img src="{{ steam_player.last_avatar }}" alt="Аватар {{ steam_player.last_nickname }}" class="avatar">
+          {% endif %}
+          <a href="{% url 'playerstat:stats' steam_player.pk %}" class="text-reset text-decoration-none">{{ steam_player.last_nickname }}</a>
+          <a href="{% url 'logout' %}">Выйти</a>
+      {% else %}
+          <a href="{% url 'social:begin' 'steam' %}">Войти через Steam</a>
+      {% endif %}
+    </div>
   </nav>
 </header>

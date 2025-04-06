@@ -72,7 +72,7 @@
                                     {% if player.last_avatar %}
                                         <img src="{{ player.last_avatar }}" alt="Аватар {{ player.last_nickname }}" class="avatar"/>
                                     {% endif %}
-                                    {{ player.last_nickname }}
+                                    <a href="{% url 'playerstat:stats' player.pk %}" class="text-reset text-decoration-none">{{ player.last_nickname }}</a>
                                 </th>
                             {% endfor %}
                         </tr>
@@ -84,7 +84,7 @@
                                     {% if player_b.last_avatar %}
                                         <img src="{{ player_b.last_avatar }}" alt="Аватар {{ player_b.last_nickname }}" class="avatar">
                                     {% endif %}
-                                    {{ player_b.last_nickname }}
+                                    <a href="{% url 'playerstat:stats' player_b.pk %}" class="text-reset text-decoration-none">{{ player_b.last_nickname }}</a>
                                 </th>
                                 {% for player_a in team_a_players %}
                                     <td class="align-middle">

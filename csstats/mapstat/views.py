@@ -77,7 +77,7 @@ class DemoScoreBoardView(DemoMixin, ListView):
                 kills_5=Sum('scoreboard__kills_5'),
                 kills_3_over=(
                     Sum('scoreboard__kills_3') +
-                    Sum('scoreboard__kills_4') + 
+                    Sum('scoreboard__kills_4') +
                     Sum('scoreboard__kills_5')
                 ),
                 first_kills=Sum('scoreboard__first_kills'),

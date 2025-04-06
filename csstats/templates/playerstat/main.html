@@ -4,8 +4,32 @@
   Статистика игрока
 {% endblock %}
 {% block content %}
+  <img src="{{ player.last_avatar }}" alt="Аватар {{ player.last_nickname }}" class="avatar"/>
+  <p>{{ player.last_nickname }}</p>
+  {% if player.auth_code %}
+    {% if user.is_authenticated and steam_user.uid == player.pk %}
+      <h2>Снова Введите код</h2> 
+      <a href="{% url 'playerstat:auth_code' player.pk %}">
+        Снова Введите код
+      </a>
+    {% endif %}
+  {% else %}  
+    {% if user.is_authenticated and steam_user.uid == player.pk %}
+      <h2>Введите код</h2>
+      <a href="{% url 'playerstat:auth_code' player.pk %}">
+        Введите код
+      </a>
+    {% else %}
+      <h2>Нет кода</h2>   
+    {% endif %}
+  {% endif %}
   <nav>
     <ul>
+        <li>
+            <a href="{% url 'playerstat:stats' player.pk %}">
+                Статистика
+            </a>
+        </li>
         <li>
             <a href="{% url 'playerstat:matches' player.pk %}">
                 Игры

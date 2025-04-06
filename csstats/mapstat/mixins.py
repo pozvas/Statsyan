@@ -3,9 +3,10 @@ from django.db.models.query import QuerySet
 from demo_database.models import Demo, Player, PlayerInDemo
 from django.db.models import Q, Count
 from django.shortcuts import get_object_or_404
+from steam.mixins import SteamUserBaseMixin
 
 
-class DemoMixin:
+class DemoMixin(SteamUserBaseMixin):
 
     def get_queryset(self) -> QuerySet[Any]:
         self.demo = get_object_or_404(Demo, pk=self.kwargs['demo_id'])

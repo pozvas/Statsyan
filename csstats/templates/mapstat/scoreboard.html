@@ -106,7 +106,7 @@
                                                 {% if player_in_demo.player.last_avatar %}
                                                     <img src="{{ player_in_demo.player.last_avatar }}" alt="Аватар {{ player_in_demo.player.last_nickname }}" class="avatar"/>
                                                 {% endif %}
-                                                <a href="{% url 'playerstat:matches' player_in_demo.player.pk %}" class="text-reset text-decoration-none">{{ player_in_demo.player.last_nickname }}</a>
+                                                <a href="{% url 'playerstat:stats' player_in_demo.player.pk %}" class="text-reset text-decoration-none">{{ player_in_demo.player.last_nickname }}</a>
                                             </td>
                                             <td class="text-center">{{ player_in_demo.kills }}</td>
                                             <td class="text-center">{{ player_in_demo.assists }}</td>
