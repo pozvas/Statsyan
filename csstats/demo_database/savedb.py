@@ -1,3 +1,4 @@
+from pathlib import Path
 from pandas import DataFrame
 from demoparser2 import DemoParser
 from demoparser.demoparser import get_duels, get_start_info, get_max_tick, get_stats, get_weapon_stat, get_rounds, get_kills_in_round
@@ -6,40 +7,8 @@ from hashlib import sha256
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 from steam.steamapi import get_players_names_and_avatars
-
-
-def save_stats(df: DataFrame):
-    demo = Demo()
-    demo.save()
-    for _, row in df.iterrows():
-        player, created = Player.objects.get_or_create(steamid=row['steamid'])
-
-        scoreboard = ScoreBoard(
-            player=player,
-            demo=demo,
-            side=row['team_name'],
-            team=row['global_team_name'],
-            kills=row['kills'],
-            assists=row['assists'],
-            deaths=row['deaths'],
-            adr=row['adr'],
-            kast=row['kast'],
-            impact=row['impact'],
-            rating=row['rating'],
-            clutches_1x1=row['clutches_1x1'],
-            clutches_1x2=row['clutches_1x2'],
-            clutches_1x3=row['clutches_1x3'],
-            clutches_1x4=row['clutches_1x4'],
-            clutches_1x5=row['clutches_1x5'],
-            first_kills=row['first_kills'],
-            first_deaths=row['first_deaths'],
-            utility_damage=row['utility_damage'],
-            enemy_flashed=row['enemy_flashed'],
-            flash_assists=row['flash_assists']
-        )
-        scoreboard.save()
-    
-    return demo.pk
+from datetime import datetime
+from django.utils import timezone
 
 
 def update_players_info(steamids=None):
@@ -55,7 +24,7 @@ def update_players_info(steamids=None):
             player.save()
 
 
-def save_demo(path: str):
+def save_demo(path: str, match_time: datetime | None = None):
     parser = DemoParser(path)
     info = get_start_info(parser)
 
@@ -71,11 +40,18 @@ def save_demo(path: str):
     demo = Demo.objects.filter(hash=hash).first()
 
     if demo is not None:
+        del parser
         return demo.pk
 
     # try:
     map = Map.objects.get(name=list_data[0])
     match_type = MatchType.objects.get(code=info['comp_rank_type'][0])
+
+    if match_time is None:
+        file_path = Path(path) 
+        match_time = datetime.fromtimestamp(file_path.stat().st_mtime)
+
+    match_time = timezone.make_aware(match_time)
 
     is_tie = info['is_tie'][0]
     duels = get_duels(parser)

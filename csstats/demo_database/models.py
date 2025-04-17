@@ -7,6 +7,7 @@ class Player(models.Model):
     last_nickname = models.CharField(max_length=32)
     last_avatar = models.CharField(max_length=255)
     date_check = models.DateTimeField(auto_now_add=True)
+    last_match_steam_sharecode = models.CharField(max_length=50, null=True, blank=True)
 
 
 class Side(models.Model):

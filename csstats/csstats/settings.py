@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from pathlib import Path
 from decouple import config
+import redis
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -45,7 +46,10 @@ INSTALLED_APPS = [
     'playerstat.apps.PlayerstatConfig',
     'django_bootstrap5',
     'social_django',
+    "django_apscheduler",
 ]
+
+REDIS_CLIENT = redis.StrictRedis(host='localhost', port=6379, db=2)
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -167,3 +171,7 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+ZIP_STTORAGE = BASE_DIR / 'uploads/zip'
+
+UNZIP_STTORAGE = BASE_DIR / 'uploads/unzip'

@@ -18,6 +18,7 @@ from .forms import PlayerCodeForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from social_django.models import UserSocialAuth
 import traceback
+from demo_database.tasks import get_new_sharecodes
 
 
 class PlayerMatchesView(PlayerListMixin, ListView):

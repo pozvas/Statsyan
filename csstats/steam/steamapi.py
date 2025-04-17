@@ -22,3 +22,17 @@ def get_players_names_and_avatars(stemaids):
         return result
     else:
         return None
+
+
+def get_next_match_code_by_player(code, steamid, steamidkey):
+    api_url = "https://api.steampowered.com/ICSGOPlayers_730/GetNextMatchSharingCode/v1"
+    response = requests.get(api_url, params={
+        'key': API_KEY,
+        'steamid': steamid,
+        'steamidkey': steamidkey,
+        'knowncode': code
+    }, timeout=5)
+    if response.status_code == 200:
+        return response.json()['result']['nextcode']
+    else:
+        return None
