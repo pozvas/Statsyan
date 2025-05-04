@@ -488,49 +488,56 @@
         "model": "demo_database.WeaponType",
         "pk": 1,
         "fields": {
-            "name": "pistols"
+            "code": "pistols",
+            "name": "Пистолеты"
         }
     },
     {
         "model": "demo_database.WeaponType",
         "pk": 2,
         "fields": {
-            "name": "heavy"
+            "code": "heavy",
+            "name": "Дробовики"
         }
     },
     {
         "model": "demo_database.WeaponType",
         "pk": 3,
         "fields": {
-            "name": "smg"
+            "code": "smg",
+            "name": "Пистолеты-пулеметы"
         }
     },
     {
         "model": "demo_database.WeaponType",
         "pk": 4,
         "fields": {
-            "name": "rifles"
+            "code": "rifles",
+            "name": "Винтовки"
         }
     },
     {
         "model": "demo_database.WeaponType",
         "pk": 5,
         "fields": {
-            "name": "sniper"
+            "code": "sniper",
+            "name": "Снайперки"
         }
     },
     {
         "model": "demo_database.WeaponType",
         "pk": 6,
         "fields": {
-            "name": "melee"
+            "code": "melee",
+            "name": "Ближний бой"
         }
     },
     {
         "model": "demo_database.WeaponType",
         "pk": 7,
         "fields": {
-            "name": "grenade"
+            "code": "grenade",
+            "name": "Гранаты"
         }
     },
     {
@@ -538,6 +545,7 @@
         "pk": 1,
         "fields": {
             "name": "weapon_revolver",
+            "caption": "Револьвер R8",
             "weapon_type": 1,
             "image": "weapons/revolver.png"
         }
@@ -547,6 +555,7 @@
         "pk": 2,
         "fields": {
             "name": "weapon_glock",
+            "caption": "Glock-18",
             "weapon_type": 1,
             "image": "weapons/glock.webp"
         }
@@ -556,6 +565,7 @@
         "pk": 3,
         "fields": {
             "name": "weapon_usp_silencer",
+            "caption": "USP-S",
             "weapon_type": 1,
             "image": "weapons/usp_silencer.webp"
         }
@@ -565,6 +575,7 @@
         "pk": 4,
         "fields": {
             "name": "weapon_p250",
+            "caption": "P250",
             "weapon_type": 1,
             "image": "weapons/p250.webp"
         }
@@ -574,6 +585,7 @@
         "pk": 5,
         "fields": {
             "name": "weapon_deagle",
+            "caption": "Desert Eagle",
             "weapon_type": 1,
             "image": "weapons/deagle.webp"
         }
@@ -583,6 +595,7 @@
         "pk": 6,
         "fields": {
             "name": "weapon_elite",
+            "caption": "Dual Berettas",
             "weapon_type": 1,
             "image": "weapons/elite.webp"
         }
@@ -592,6 +605,7 @@
         "pk": 7,
         "fields": {
             "name": "weapon_fiveseven",
+            "caption": "Five-SeveN",
             "weapon_type": 1,
             "image": "weapons/fiveseven.webp"
         }
@@ -601,6 +615,7 @@
         "pk": 8,
         "fields": {
             "name": "weapon_tec9",
+            "caption": "Tec-9",
             "weapon_type": 1,
             "image": "weapons/tec9.webp"
         }
@@ -610,6 +625,7 @@
         "pk": 9,
         "fields": {
             "name": "weapon_cz75a",
+            "caption": "CZ75-Auto",
             "weapon_type": 1,
             "image": "weapons/cz75a.png"
         }
@@ -619,6 +635,7 @@
         "pk": 10,
         "fields": {
             "name": "weapon_hkp2000",
+            "caption": "P2000",
             "weapon_type": 1,
             "image": "weapons/hkp2000.webp"
         }
@@ -628,6 +645,7 @@
         "pk": 11,
         "fields": {
             "name": "weapon_nova",
+            "caption": "Nova",
             "weapon_type": 2,
             "image": "weapons/nova.png"
         }
@@ -637,6 +655,7 @@
         "pk": 12,
         "fields": {
             "name": "weapon_xm1014",
+            "caption": "XM1014",
             "weapon_type": 2,
             "image": "weapons/xm1014.png"
         }
@@ -646,6 +665,7 @@
         "pk": 13,
         "fields": {
             "name": "weapon_mag7",
+            "caption": "MAG-7",
             "weapon_type": 2,
             "image": "weapons/mag7.webp"
         }
@@ -655,6 +675,7 @@
         "pk": 14,
         "fields": {
             "name": "weapon_sawedoff",
+            "caption": "Sawed-Off",
             "weapon_type": 2,
             "image": "weapons/sawedoff.png"
         }
@@ -664,6 +685,7 @@
         "pk": 15,
         "fields": {
             "name": "weapon_negev",
+            "caption": "Негев",
             "weapon_type": 2,
             "image": "weapons/negev.png"
         }
@@ -673,6 +695,7 @@
         "pk": 16,
         "fields": {
             "name": "weapon_m249",
+            "caption": "M249",
             "weapon_type": 2,
             "image": "weapons/m249.png"
         }
@@ -682,6 +705,7 @@
         "pk": 17,
         "fields": {
             "name": "weapon_mac10",
+            "caption": "MAC-10",
             "weapon_type": 3,
             "image": "weapons/mac10.webp"
         }
@@ -691,6 +715,7 @@
         "pk": 18,
         "fields": {
             "name": "weapon_mp9",
+            "caption": "MP9",
             "weapon_type": 3,
             "image": "weapons/mp9.webp"
         }
@@ -700,6 +725,7 @@
         "pk": 19,
         "fields": {
             "name": "weapon_mp7",
+            "caption": "MP7",
             "weapon_type": 3,
             "image": "weapons/mp7.png"
         }
@@ -709,6 +735,7 @@
         "pk": 20,
         "fields": {
             "name": "weapon_ump45",
+            "caption": "UMP-45",
             "weapon_type": 3,
             "image": "weapons/ump45.webp"
         }
@@ -718,6 +745,7 @@
         "pk": 21,
         "fields": {
             "name": "weapon_p90",
+            "caption": "P90",
             "weapon_type": 3,
             "image": "weapons/p90.png"
         }
@@ -727,6 +755,7 @@
         "pk": 22,
         "fields": {
             "name": "weapon_bizon",
+            "caption": "ПП-19 «Бизон»",
             "weapon_type": 3,
             "image": "weapons/bizon.png"
         }
@@ -736,6 +765,7 @@
         "pk": 23,
         "fields": {
             "name": "weapon_mp5sd",
+            "caption": "MP5-SD",
             "weapon_type": 3,
             "image": "weapons/mp5sd.png"
         }
@@ -745,6 +775,7 @@
         "pk": 24,
         "fields": {
             "name": "weapon_galilar",
+            "caption": "Автомат «Галиль»",
             "weapon_type": 4,
             "image": "weapons/galilar.webp"
         }
@@ -754,6 +785,7 @@
         "pk": 25,
         "fields": {
             "name": "weapon_famas",
+            "caption": "FAMAS",
             "weapon_type": 4,
             "image": "weapons/famas.webp"
         }
@@ -763,6 +795,7 @@
         "pk": 26,
         "fields": {
             "name": "weapon_ak47",
+            "caption": "AK-47",
             "weapon_type": 4,
             "image": "weapons/ak47.webp"
         }
@@ -772,6 +805,7 @@
         "pk": 27,
         "fields": {
             "name": "weapon_m4a1",
+            "caption": "M4A4",
             "weapon_type": 4,
             "image": "weapons/m4a1.webp"
         }
@@ -781,6 +815,7 @@
         "pk": 28,
         "fields": {
             "name": "weapon_m4a1_silencer",
+            "caption": "M4A1-S",
             "weapon_type": 4,
             "image": "weapons/m4a1_silencer.webp"
         }
@@ -790,6 +825,7 @@
         "pk": 29,
         "fields": {
             "name": "weapon_ssg08",
+            "caption": "SSG 08",
             "weapon_type": 5,
             "image": "weapons/ssg08.webp"
         }
@@ -799,6 +835,7 @@
         "pk": 30,
         "fields": {
             "name": "weapon_sg556",
+            "caption": "SG 553",
             "weapon_type": 4,
             "image": "weapons/sg556.webp"
         }
@@ -808,6 +845,7 @@
         "pk": 31,
         "fields": {
             "name": "weapon_aug",
+            "caption": "AUG",
             "weapon_type": 4,
             "image": "weapons/aug.webp"
         }
@@ -817,6 +855,7 @@
         "pk": 32,
         "fields": {
             "name": "weapon_awp",
+            "caption": "AWP",
             "weapon_type": 5,
             "image": "weapons/awp.webp"
         }
@@ -826,6 +865,7 @@
         "pk": 33,
         "fields": {
             "name": "weapon_scar20",
+            "caption": "SCAR-20",
             "weapon_type": 5,
             "image": "weapons/scar20.png"
         }
@@ -835,6 +875,7 @@
         "pk": 34,
         "fields": {
             "name": "weapon_g3sg1",
+            "caption": "G3SG1",
             "weapon_type": 5,
             "image": "weapons/g3sg1.webp"
         }
@@ -844,6 +885,7 @@
         "pk": 35,
         "fields": {
             "name": "weapon_knife",
+            "caption": "Нож",
             "weapon_type": 6,
             "image": "weapons/knife.webp"
         }
@@ -853,6 +895,7 @@
         "pk": 36,
         "fields": {
             "name": "weapon_taser",
+            "caption": "Zeus x27",
             "weapon_type": 6,
             "image": "weapons/taser.png"
         }
@@ -862,6 +905,7 @@
         "pk": 37,
         "fields": {
             "name": "weapon_molotov",
+            "caption": "Коктель Молотова",
             "weapon_type": 7,
             "image": "weapons/molotov.png"
         }
@@ -871,6 +915,7 @@
         "pk": 38,
         "fields": {
             "name": "weapon_flashbang",
+            "caption": "Светошумовая граната",
             "weapon_type": 7,
             "image": "weapons/flashbang.webp"
         }
@@ -880,6 +925,7 @@
         "pk": 39,
         "fields": {
             "name": "weapon_hegrenade",
+            "caption": "Осколочная грнаната",
             "weapon_type": 7,
             "image": "weapons/hegrenade.webp"
         }
@@ -889,6 +935,7 @@
         "pk": 40,
         "fields": {
             "name": "weapon_decoy",
+            "caption": "Ложная граната",
             "weapon_type": 7,
             "image": "weapons/decoy.png"
         }
@@ -898,6 +945,7 @@
         "pk": 41,
         "fields": {
             "name": "weapon_smokegrenade",
+            "caption": "Дымовая граната",
             "weapon_type": 7,
             "image": "weapons/smoke.png"
         }
@@ -907,6 +955,7 @@
         "pk": 42,
         "fields": {
             "name": "weapon_incgrenade",
+            "caption": "ЗАжигательная граната",
             "weapon_type": 7,
             "image": "weapons/incgrenade.png"
         }
@@ -916,6 +965,7 @@
         "pk": 43,
         "fields": {
             "name": "weapon_inferno",
+            "caption": "Огонь",
             "weapon_type": 7,
             "image": "weapons/inferno.webp"
         }

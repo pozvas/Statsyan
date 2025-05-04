@@ -183,8 +183,6 @@ def get_buy_type_by_rounds(parser: DemoParser) -> pd.DataFrame:
 parser = DemoParser(
     r"C:\Projects\Python\diplom\csstats_backend\csstats\files\allweapon.dem"
 )
-info = get_start_info(parser)
-print(info[info["is_win"]]["global_team_name"].max())
 
 
 def get_rounds_count(parser: DemoParser) -> pd.DataFrame:

@@ -208,14 +208,14 @@ class Duels(models.Model):
 
 
 class WeaponType(models.Model):
+    code = models.CharField(max_length=32)
     name = models.CharField(max_length=32)
 
 
 class Weapon(models.Model):
     name = models.CharField(max_length=32)
-    weapon_type = models.ForeignKey(
-        WeaponType, on_delete=models.DO_NOTHING, null=True, blank=True
-    )
+    caption = models.CharField(max_length=32)
+    weapon_type = models.ForeignKey(WeaponType, on_delete=models.DO_NOTHING)
     image = models.ImageField(null=True)
 
 
@@ -227,13 +227,17 @@ class PlayerWeaponStat(models.Model):
     demo = models.ForeignKey(Demo, on_delete=models.DO_NOTHING)
     player = models.ForeignKey(Player, on_delete=models.DO_NOTHING)
     side = models.ForeignKey(Side, on_delete=models.DO_NOTHING)
-    weapon = models.ForeignKey(Weapon, on_delete=models.DO_NOTHING)
+    weapon = models.ForeignKey(
+        Weapon, on_delete=models.DO_NOTHING, related_name="weapon_player_stat"
+    )
     fires_count = models.IntegerField()
 
 
 class PlayerHitgroupStat(models.Model):
     player_weapon_stat = models.ForeignKey(
-        PlayerWeaponStat, on_delete=models.DO_NOTHING
+        PlayerWeaponStat,
+        on_delete=models.DO_NOTHING,
+        related_name="hitgroup_stat",
     )
     hit_group = models.ForeignKey(HitGroup, on_delete=models.DO_NOTHING)
     damage = models.IntegerField()

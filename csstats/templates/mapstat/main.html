@@ -22,6 +22,11 @@
             Раунды
           </a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.resolver_match.url_name == 'weapons' %}active{% endif %}" href="{% url 'mapstat:weapons' demo.id %}">
+            Оружия
+          </a>
+        </li>
       </ul>
     </div>
   </nav>

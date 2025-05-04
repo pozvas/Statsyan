@@ -42,6 +42,8 @@ def update_players_info(steamids=None):
         steamids = Player.objects.values_list("pk", flat=True)
 
     players_data = get_players_names_and_avatars(steamids)
+    if players_data is None:
+        return
     for player_data in players_data:
         with transaction.atomic():
             player = Player.objects.get(pk=player_data["steamid"])
@@ -87,6 +89,8 @@ def save_demo(path: str, match_time: datetime | None = None):
     kills_in_round = get_kills_in_round(parser)
     del parser
 
+    new_players = []
+
     with transaction.atomic():
         demo = Demo.objects.create(
             hash=hash,
@@ -107,7 +111,11 @@ def save_demo(path: str, match_time: datetime | None = None):
         )
 
         for _, row in info.iterrows():
-            player, _ = Player.objects.get_or_create(steamid=row["steamid"])
+            player, created = Player.objects.get_or_create(
+                steamid=row["steamid"]
+            )
+            if created:
+                new_players.append(player.pk)
             rank = (
                 None
                 if match_type.is_elo
@@ -220,7 +228,7 @@ def save_demo(path: str, match_time: datetime | None = None):
             )
             for _, row2 in weapon_hurt[
                 (weapon_hurt["weapon"] == weapon.name)
-                & (weapon_hurt["team_name"] == side.name)
+                & (weapon_hurt["team_name"] == side.code)
                 & (weapon_hurt["steamid"] == player.steamid)
             ].iterrows():
                 hit_group = HitGroup.objects.get(name=row2["hitgroup"])
@@ -240,11 +248,6 @@ def save_demo(path: str, match_time: datetime | None = None):
                 demo=demo,
                 round_number=row["total_rounds_played"],
                 win_reason=win_reason,
-                win_team_name=(
-                    row["global_team_name_ct"]
-                    if win_reason.win_side.code == "CT"
-                    else row["global_team_name_t"]
-                ),
                 ct_buy_type=buy_type_ct,
                 ct_buy_sum=row["equip_value_sum_ct"],
                 ct_buy_avg_sum=row["equip_value_ct"],
@@ -293,7 +296,7 @@ def save_demo(path: str, match_time: datetime | None = None):
                     kill_time=row2["kill_time"],
                 )
 
-        update_players_info()
+        update_players_info(new_players)
         return demo.pk
 
     # except ObjectDoesNotExist:

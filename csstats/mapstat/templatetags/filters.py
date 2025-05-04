@@ -27,3 +27,8 @@ def range_from_zero(value):
 @register.filter(name="subtract")
 def subtract(value, arg):
     return value - arg
+
+
+@register.filter(name="divide_02")
+def divide_02(value, arg):
+    return f"{(value / arg * 100):.2f}"

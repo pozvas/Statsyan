@@ -1,0 +1,100 @@
+{% extends "mapstat/main.html" %}
+{% load django_bootstrap5 %}
+{% load filters %}
+{% load static %}
+{% block data %}
+    <div class="container mt-4">
+        <h1 class="mb-4 text-center">Статистика по оружиям в матче</h1>
+        <form method="GET" action="" class="mb-4">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label for="player" class="form-label">Фильтр по игрокам:</label>
+                    <select id="player" name="player" class="form-select">
+                        <option value="">Все</option>
+                        {% for player in team_a_players %}
+                            <option value="{{ player.pk }}" {% if request.GET.player == player.pk|stringformat:"s" %}selected{% endif %}>
+                                {{ player.last_nickname }}
+                            </option>
+                        {% endfor %}
+                        {% for player in team_b_players %}
+                            <option value="{{ player.pk }}" {% if request.GET.player == player.pk|stringformat:"s" %}selected{% endif %}>
+                                {{ player.last_nickname }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="weapon_type" class="form-label">Фильтр по типу оружия:</label>
+                    <select id="weapon_type" name="weapon_type" class="form-select">
+                        <option value="">Всё</option>
+                        {% for weapon_type in weapon_types %}
+                            <option value="{{ weapon_type.id }}" {% if request.GET.weapon_type == weapon_type.id|stringformat:"s" %}selected{% endif %}>{{ weapon_type.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="side" class="form-label">Фильтр по стороне:</label>
+                    <select id="side" name="side" class="form-select">
+                        <option value="">Всё</option>
+                        {% for side in sides %}
+                            <option value="{{ side.id }}" {% if request.GET.side == side.id|stringformat:"s" %}selected{% endif %}>{{ side.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary mt-3">Применить</button>
+        </form>
+    </div>
+
+    <div class="container mt-4">
+        <div class="row">
+            {% for weapon in weapons %}
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-header bg-dark text-white">
+                        <div class="d-flex align-items-center">
+                            <img src="{% static weapon.image %}" alt="{{ weapon.caption }}" style="height: 40px; width: auto; margin-right: 15px;">
+                            <h5 class="mb-0">{{ weapon.caption }}</h5>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-striped table-bordered">
+                            <tbody>
+                                <tr>
+                                    <th scope="row">Урон</th>
+                                    <td>{{ weapon.damage }}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Убийства</th>
+                                    <td>{{ weapon.kills }}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Попадания</th>
+                                    <td>{{ weapon.hits }}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Выстрелы</th>
+                                    <td>{{ weapon.fires }}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Точность</th>
+                                    <td>{{ weapon.hits|divide_02:weapon.fires }}%</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Хедшоты</th>
+                                    <td>{{ weapon.headshots|divide_02:weapon.hits }}%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% if forloop.counter|divisibleby:2 and not forloop.last %}
+        </div>
+        <div class="row">
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+{% endblock %}

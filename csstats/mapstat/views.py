@@ -1,16 +1,20 @@
 from typing import Any
+from django.db import connection
 from django.db.models.query import QuerySet
 from django.shortcuts import render, get_object_or_404
 from mapstat.mixins import DemoMixin
 from demo_database.models import (
     Demo,
     PlayerInDemo,
+    PlayerWeaponStat,
     Side,
     BuyType,
     Duels,
     Player,
     Round,
     KillsInRound,
+    Weapon,
+    WeaponType,
 )
 from django.db.models.functions import Coalesce
 from django.db.models import (
@@ -44,8 +48,29 @@ class DemoScoreBoardView(DemoMixin, ListView):
 
     def get_queryset(self) -> QuerySet[Any]:
         super().get_queryset()
-        self.sides = Side.objects.all()
         self.buy_types = BuyType.objects.all()
+
+        self.win_team_t_score = (
+            Round.objects.filter(
+                demo=self.demo,
+                t_team_name=self.demo.win_team,
+                win_reason__win_side__code="TERRORIST",
+            )
+            .values("demo")
+            .annotate(count=Count("id"))
+            .values("count")
+        )
+
+        self.lose_team_t_score = (
+            Round.objects.filter(
+                ~Q(t_team_name=self.demo.win_team)
+                & Q(demo=self.demo)
+                & Q(win_reason__win_side__code="TERRORIST")
+            )
+            .values("demo")
+            .annotate(count=Count("id"))
+            .values("count")
+        )
 
         side_filter = self.request.GET.get("side")
         buy_type_filter = self.request.GET.get("buy_type")
@@ -145,8 +170,9 @@ class DemoScoreBoardView(DemoMixin, ListView):
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         contex = super().get_context_data(**kwargs)
-        contex["sides"] = self.sides
         contex["buy_types"] = self.buy_types
+        contex["lose_team_t_score"] = self.lose_team_t_score.count
+        contex["win_team_t_score"] = self.win_team_t_score.count
         return contex
 
 
@@ -329,7 +355,71 @@ class DemoRoundsView(DemoMixin, ListView):
 
 
 class DemoWeaponView(DemoMixin, ListView):
-    pass
+    template_name = "mapstat/weapons.html"
+    context_object_name = "weapons"
+
+    def get_queryset(self) -> QuerySet[Any]:
+        super().get_queryset()
+        self.weapon_types = WeaponType.objects.all()
+
+        side_filter = self.request.GET.get("side")
+        player_filter = self.request.GET.get("player")
+        weapon_type_filter = self.request.GET.get("weapon_type")
+
+        filters = Q(
+            weapon_player_stat__isnull=False,
+            weapon_player_stat__hitgroup_stat__isnull=False,
+        )
+
+        if side_filter:
+            filters = filters & Q(weapon_player_stat__side=side_filter)
+
+        if weapon_type_filter:
+            filters = filters & Q(weapon_type=weapon_type_filter)
+
+        if player_filter:
+            filters = filters & Q(Q(weapon_player_stat__player=player_filter))
+
+        query = f"""
+        SELECT
+            w.id,
+            w.name,
+            w.caption,
+            w.weapon_type_id,
+            w.image,
+            SUM(DISTINCT pws.fires_count) AS fires,
+            SUM(phs.damage) AS damage,
+            SUM(phs.kills) AS kills,
+            SUM(phs.hits) AS hits,
+            SUM(CASE WHEN hg.name = 'head' THEN phs.hits ELSE 0 END) AS headshots
+        FROM demo_database_weapon w
+        JOIN demo_database_playerweaponstat pws ON w.id = pws.weapon_id
+        JOIN demo_database_playerhitgroupstat phs ON pws.id = phs.player_weapon_stat_id
+        LEFT JOIN demo_database_playerindemo pid ON pid.demo_id = pws.demo_id AND pid.player_id = pws.player_id
+        LEFT JOIN demo_database_hitgroup hg ON phs.hit_group_id = hg.id
+        WHERE pws.demo_id = %s 
+        {f"AND pws.side_id = {side_filter}" if side_filter else ""}
+        {f"AND w.weapon_type_id = {weapon_type_filter}" if weapon_type_filter else ""}
+        {f"AND (pws.player_id = {player_filter} OR pid.team = '{player_filter}')" if player_filter else ""}
+        GROUP BY w.id, w.name, w.caption, w.weapon_type_id, w.image
+        """
+
+        with connection.cursor() as cursor:
+            cursor.execute(
+                query,
+                [
+                    self.demo.id,
+                ],
+            )
+            columns = [col[0] for col in cursor.description]
+            results = [dict(zip(columns, row)) for row in cursor.fetchall()]
+
+            return results
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        contex = super().get_context_data(**kwargs)
+        contex["weapon_types"] = self.weapon_types
+        return contex
 
 
 def upload_demo(request):
