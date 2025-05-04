@@ -19,56 +19,172 @@
         "model": "demo_database.Map",
         "pk": 1,
         "fields": {
-            "name": "de_train"
+            "name": "de_train",
+            "image": "map/de_train.png"
         }
     },
     {
         "model": "demo_database.Map",
         "pk": 2,
         "fields": {
-            "name": "de_dust2"
+            "name": "de_dust2",
+            "image": "map/de_dust2.png"
         }
     },
     {
         "model": "demo_database.Map",
         "pk": 3,
         "fields": {
-            "name": "de_mirage"
+            "name": "de_mirage",
+            "image": "map/de_mirage.png"
         }
     },
     {
         "model": "demo_database.Map",
         "pk": 4,
         "fields": {
-            "name": "de_nuke"
+            "name": "de_nuke",
+            "image": "map/de_nuke.png"
         }
     },
     {
         "model": "demo_database.Map",
         "pk": 5,
         "fields": {
-            "name": "de_anubis"
+            "name": "de_anubis",
+            "image": "map/de_anubis.png"
         }
     },
     {
         "model": "demo_database.Map",
         "pk": 6,
         "fields": {
-            "name": "de_ancient"
+            "name": "de_ancient",
+            "image": "map/de_ancient.png"
         }
     },
     {
         "model": "demo_database.Map",
         "pk": 7,
         "fields": {
-            "name": "de_inferno"
+            "name": "de_inferno",
+            "image": "map/de_inferno.png"
         }
     },
     {
         "model": "demo_database.Map",
         "pk": 8,
         "fields": {
-            "name": "de_vertigo"
+            "name": "de_vertigo",
+            "image": "map/de_vertigo.png"
+        }
+    },
+    {
+        "model": "demo_database.Map",
+        "pk": 9
+        ,
+        "fields": {
+            "name": "de_cache",
+            "image": "map/de_cache.png"
+        }
+    },
+    {
+        "model": "demo_database.Map",
+        "pk": 10
+        ,
+        "fields": {
+            "name": "de_overpass",
+            "image": "map/de_overpass.png"
+        }
+    },
+    {
+        "model": "demo_database.Map",
+        "pk": 11
+        ,
+        "fields": {
+            "name": "de_basalt",
+            "image": "map/de_basalt.png"
+        }
+    },
+    {
+        "model": "demo_database.Map",
+        "pk": 12
+        ,
+        "fields": {
+            "name": "de_edin",
+            "image": "map/de_edin.png"
+        }
+    },
+    {
+        "model": "demo_database.Map",
+        "pk": 13
+        ,
+        "fields": {
+            "name": "cs_office",
+            "image": "map/cs_office.png"
+        }
+    },
+    {
+        "model": "demo_database.Map",
+        "pk": 14
+        ,
+        "fields": {
+            "name": "cs_italy",
+            "image": "map/cs_italy.png"
+        }
+    },
+    {
+        "model": "demo_database.Map",
+        "pk": 15
+        ,
+        "fields": {
+            "name": "de_palais",
+            "image": "map/de_palais.png"
+        }
+    },
+    {
+        "model": "demo_database.Map",
+        "pk": 16
+        ,
+        "fields": {
+            "name": "de_whistle",
+            "image": "map/de_whistle.png"
+        }
+    },
+    {
+        "model": "demo_database.Map",
+        "pk": 17
+        ,
+        "fields": {
+            "name": "de_assembly",
+            "image": "map/de_assembly.png"
+        }
+    },
+    {
+        "model": "demo_database.Map",
+        "pk": 18
+        ,
+        "fields": {
+            "name": "de_memento",
+            "image": "map/de_memento.png"
+        }
+    },
+    {
+        "model": "demo_database.Map",
+        "pk": 19
+        ,
+        "fields": {
+            "name": "de_mills",
+            "image": "map/de_mills.png"
+        }
+    },
+    {
+        "model": "demo_database.Map",
+        "pk": 20
+        ,
+        "fields": {
+            "name": "de_thera",
+            "image": "map/de_thera.png"
         }
     },
     {
@@ -76,7 +192,7 @@
         "pk": 1,
         "fields": {
             "code": 11,
-            "name": "Valve Premier",
+            "name": "Valve Премьер",
             "is_elo": 1
         }
     },
@@ -85,7 +201,7 @@
         "pk": 2,
         "fields": {
             "code": 12,
-            "name": "Valve Competitive",
+            "name": "Valve Соревновательный",
             "is_elo": 0
         }
     },
@@ -94,7 +210,7 @@
         "pk": 3,
         "fields": {
             "code": 7,
-            "name": "Valve Wingman",
+            "name": "Valve Напарники",
             "is_elo": 0
         }
     },
@@ -103,7 +219,7 @@
         "pk": 4,
         "fields": {
             "code": -1,
-            "name": "Other",
+            "name": "Другое",
             "is_elo": 0
         }
     },

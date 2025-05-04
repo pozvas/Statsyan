@@ -19,6 +19,7 @@ class Side(models.Model):
 
 class Map(models.Model):
     name = models.CharField(max_length=32)
+    image = models.ImageField(null=True)
 
 
 class MatchType(models.Model):
@@ -56,7 +57,7 @@ class Demo(models.Model):
 
 
 class Round(models.Model):
-    demo = models.ForeignKey(Demo, on_delete=models.DO_NOTHING)
+    demo = models.ForeignKey(Demo, on_delete=models.CASCADE)
     round_number = models.SmallIntegerField()
     win_reason = models.ForeignKey(WinReason, on_delete=models.DO_NOTHING)
     ct_team_name = models.CharField(max_length=32, null=True, blank=True)
@@ -134,7 +135,7 @@ class MMRank(models.Model):
 
 class PlayerInDemo(models.Model):
     player = models.ForeignKey(Player, on_delete=models.DO_NOTHING)
-    demo = models.ForeignKey(Demo, on_delete=models.DO_NOTHING)
+    demo = models.ForeignKey(Demo, on_delete=models.CASCADE)
     team = models.CharField(max_length=20)
     crosshair_code = models.CharField(max_length=40)
     elo_old = models.IntegerField(null=True, blank=True)
@@ -145,9 +146,7 @@ class PlayerInDemo(models.Model):
 
 
 class ScoreBoard(models.Model):
-    player_in_demo = models.ForeignKey(
-        PlayerInDemo, on_delete=models.DO_NOTHING
-    )
+    player_in_demo = models.ForeignKey(PlayerInDemo, on_delete=models.CASCADE)
     side = models.ForeignKey(Side, on_delete=models.DO_NOTHING)
 
     buy_type = models.ForeignKey(
@@ -196,7 +195,7 @@ class ScoreBoard(models.Model):
 
 
 class Duels(models.Model):
-    demo = models.ForeignKey(Demo, on_delete=models.DO_NOTHING)
+    demo = models.ForeignKey(Demo, on_delete=models.CASCADE)
     attacker_player = models.ForeignKey(
         Player, on_delete=models.DO_NOTHING, related_name="duel_attacker"
     )
@@ -224,7 +223,7 @@ class HitGroup(models.Model):
 
 
 class PlayerWeaponStat(models.Model):
-    demo = models.ForeignKey(Demo, on_delete=models.DO_NOTHING)
+    demo = models.ForeignKey(Demo, on_delete=models.CASCADE)
     player = models.ForeignKey(Player, on_delete=models.DO_NOTHING)
     side = models.ForeignKey(Side, on_delete=models.DO_NOTHING)
     weapon = models.ForeignKey(
@@ -236,7 +235,7 @@ class PlayerWeaponStat(models.Model):
 class PlayerHitgroupStat(models.Model):
     player_weapon_stat = models.ForeignKey(
         PlayerWeaponStat,
-        on_delete=models.DO_NOTHING,
+        on_delete=models.CASCADE,
         related_name="hitgroup_stat",
     )
     hit_group = models.ForeignKey(HitGroup, on_delete=models.DO_NOTHING)

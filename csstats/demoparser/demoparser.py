@@ -868,6 +868,15 @@ def get_enemy_flashed(parser: DemoParser) -> pd.DataFrame:
     )
     flashes["steamid"] = flashes["steamid"].astype(str)
 
+    def subtract_previous_flashes(group):
+        current_flashes = group["enemies_flashed_total"].values
+        prev_flashes = group["enemies_flashed_total"].shift().fillna(0).values
+        group["flashes_diff"] = current_flashes - prev_flashes
+        return group
+
+    flashes = flashes.groupby("steamid").apply(subtract_previous_flashes)
+    flashes["enemies_flashed_total"] = flashes["flashes_diff"]
+
     flashes = flashes.merge(
         get_buy_type_by_rounds(parser), on=["total_rounds_played", "team_name"]
     )
@@ -1252,6 +1261,10 @@ def get_rounds(parser: DemoParser) -> pd.DataFrame:
 
 
 def get_kills_in_round(parser: DemoParser) -> pd.DataFrame:
+    round_end = parser.parse_event("round_officially_ended").drop_duplicates()
+    round_end = pd.concat(
+        [round_end, parser.parse_event("cs_win_panel_match")]
+    ).reset_index(drop=True)
     deaths = parser.parse_event(
         "player_death",
         other=["total_rounds_played", "game_time", "round_start_time"],
@@ -1268,6 +1281,20 @@ def get_kills_in_round(parser: DemoParser) -> pd.DataFrame:
         }
     )
     deaths = deaths[deaths["attacker_steamid"].notna()]
+
+    def kills_after_round(row, round_end):
+        if row["round"] == 0:
+            return row["round"]
+        round_tick = round_end.iloc[row["round"] - 1]["tick"]
+        if row["tick"] <= round_tick:
+            row["round"] = row["round"] - 1
+            return row["round"] - 1
+
+        return row["round"]
+
+    deaths["total_rounds_played"] = deaths.apply(
+        lambda row: kills_after_round(row, round_end), axis=1
+    )
     ticks = parser.parse_ticks(["team_name"], ticks=deaths["tick"].to_list())
 
     def get_team_name(row, ticks, steamid_column):

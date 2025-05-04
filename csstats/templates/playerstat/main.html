@@ -23,21 +23,91 @@
       <h2>Нет кода</h2>   
     {% endif %}
   {% endif %}
-  <nav>
-    <ul>
-        <li>
-            <a href="{% url 'playerstat:stats' player.pk %}">
-                Статистика
-            </a>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link {% if request.resolver_match.url_name == 'stats' %}active{% endif %}" href="{% url 'playerstat:stats' player.pk %}">
+            Статистика
+          </a>
         </li>
-        <li>
-            <a href="{% url 'playerstat:matches' player.pk %}">
-                Игры
-            </a>
+        <li class="nav-item">
+          <a class="nav-link {% if request.resolver_match.url_name == 'matches' %}active{% endif %}" href="{% url 'playerstat:matches' player.pk %}">
+            Игры
+          </a>
         </li>
-    </ul>
-    <div>
-        {% block data %}{% endblock %}
+      </ul>
     </div>
   </nav>
+  <div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <!-- Фильтр по дате -->
+            <div class="col-md-2">
+                <label for="start_date" class="form-label">Дата с</label>
+                <input type="date" class="form-control" id="start_date" name="start_date" value="{{ request.GET.start_date }}">
+            </div>
+            <div class="col-md-2">
+                <label for="end_date" class="form-label">Дата по</label>
+                <input type="date" class="form-control" id="end_date" name="end_date" value="{{ request.GET.end_date }}">
+            </div>
+            
+            <!-- Фильтр по карте -->
+            <div class="col-md-2">
+                <label for="map" class="form-label">Карта</label>
+                <select class="form-select" id="map" name="map">
+                    <option value="">Все карты</option>
+                    {% for map in maps %}
+                        <option value="{{ map.id }}" {% if request.GET.map == map.id|stringformat:"s" %}selected{% endif %}>
+                            {{ map.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <!-- Фильтр по режиму -->
+            <div class="col-md-2">
+                <label for="mode" class="form-label">Режим</label>
+                <select class="form-select" id="mode" name="mode">
+                    <option value="">Все режимы</option>
+                    {% for mode in math_types %}
+                        <option value="{{ mode.id }}" {% if request.GET.mode == mode.id|stringformat:"s" %}selected{% endif %}>
+                            {{ mode.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <!-- Фильтр по рейтингу -->
+            <div class="col-md-2">
+                <label for="min_rating" class="form-label">Рейтинг от</label>
+                <input type="number" step="0.01" min="0" max="10" class="form-control" 
+                       id="min_rating" name="min_rating" placeholder="0.00"
+                       value="{{ request.GET.min_rating }}">
+            </div>
+            <div class="col-md-2">
+                <label for="max_rating" class="form-label">Рейтинг до</label>
+                <input type="number" step="0.01" min="0" max="10" class="form-control" 
+                       id="max_rating" name="max_rating" placeholder="2.00"
+                       value="{{ request.GET.max_rating }}">
+            </div>
+            
+            <!-- Кнопки -->
+            <div class="col-md-12 d-flex justify-content-end align-items-end">
+                <button type="submit" class="btn btn-primary me-2">
+                    <i class="bi bi-funnel"></i> Применить фильтры
+                </button>
+                {% if has_filters %}
+                    <a href="?" class="btn btn-outline-secondary">
+                        <i class="bi bi-x-circle"></i> Сбросить
+                    </a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+</div>
+  <div>
+      {% block data %}{% endblock %}
+  </div>
+
 {% endblock %}
