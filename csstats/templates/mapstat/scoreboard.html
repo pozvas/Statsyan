@@ -1,5 +1,6 @@
 {% extends "mapstat/main.html" %}
 {% load django_bootstrap5 %}
+{% load filters %}
 {% block data %}
     <div class="container mt-4">
         <h1 class="mb-4 text-center">Статистика матча</h1>
@@ -39,7 +40,27 @@
         <div class="table-responsive">
             {% for team_name in teams_name %}
                 <div class="row mb-4">
-                    <div class="col-md-12">
+                    <div class="col-md-1 d-flex align-items-center justify-content-center">
+                        <div class="text-center">
+                            {% if team_name == demo.win_team %}
+                                <div class="display-4 fw-bold mb-2">{{ demo.score_win }}</div>
+                                <div class="d-flex justify-content-around" style="font-size: 1.5rem;">
+                                    <span class="text-primary font-weight-bold px-2">{{ demo.score_win|subtract:win_team_t_score }}</span>
+                                    <span class="text-warning font-weight-bold px-2">{{ win_team_t_score }}</span>
+                                </div>
+                                <div class="winner-icon">
+                                    <img src="/static/winner-icon.png" alt="Winner" style="width: 40px; height: 40px;">
+                                </div>
+                            {% else %}
+                                <div class="display-4 fw-bold mb-2">{{ demo.score_lose }}</div>
+                                <div class="d-flex justify-content-around" style="font-size: 1.5rem;">
+                                    <span class="text-primary font-weight-bold px-2">{{ demo.score_lose|subtract:lose_team_t_score }}</span>
+                                    <span class="text-warning font-weight-bold px-2">{{ lose_team_t_score }}</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-11">
                         <table class="table table-striped table-hover">
                             <thead>
                                 <tr>

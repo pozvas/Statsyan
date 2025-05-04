@@ -7,7 +7,9 @@ class Player(models.Model):
     last_nickname = models.CharField(max_length=32)
     last_avatar = models.CharField(max_length=255)
     date_check = models.DateTimeField(auto_now_add=True)
-    last_match_steam_sharecode = models.CharField(max_length=50, null=True, blank=True)
+    last_match_steam_sharecode = models.CharField(
+        max_length=50, null=True, blank=True
+    )
 
 
 class Side(models.Model):
@@ -28,7 +30,10 @@ class MatchType(models.Model):
 class WinReason(models.Model):
     code = models.IntegerField()
     name = models.CharField(max_length=32)
-    win_side = models.ForeignKey(Side, on_delete=models.DO_NOTHING, blank=True, null=True)
+    win_side = models.ForeignKey(
+        Side, on_delete=models.DO_NOTHING, blank=True, null=True
+    )
+    image = models.ImageField(null=True)
 
 
 class BuyType(models.Model):
@@ -55,27 +60,63 @@ class Round(models.Model):
     round_number = models.SmallIntegerField()
     win_reason = models.ForeignKey(WinReason, on_delete=models.DO_NOTHING)
     ct_team_name = models.CharField(max_length=32, null=True, blank=True)
-    ct_buy_type = models.ForeignKey(BuyType, on_delete=models.DO_NOTHING, related_name='ct_buy_type')
+    ct_buy_type = models.ForeignKey(
+        BuyType, on_delete=models.DO_NOTHING, related_name="ct_buy_type"
+    )
     ct_buy_sum = models.IntegerField()
     ct_buy_avg_sum = models.IntegerField()
     t_team_name = models.CharField(max_length=32, null=True, blank=True)
-    t_buy_type = models.ForeignKey(BuyType, on_delete=models.DO_NOTHING, related_name='t_buy_type')
+    t_buy_type = models.ForeignKey(
+        BuyType, on_delete=models.DO_NOTHING, related_name="t_buy_type"
+    )
     t_buy_sum = models.IntegerField()
     t_buy_avg_sum = models.IntegerField()
 
     class Meta:
-        ordering = ('round_number',)
+        ordering = ("round_number",)
 
 
 class KillsInRound(models.Model):
-    round = models.ForeignKey(Round, on_delete=models.CASCADE, related_name='kills')
-    attacker = models.ForeignKey(Player, on_delete=models.DO_NOTHING, null=True, blank=True, related_name='attacker')
-    attacker_side = models.ForeignKey(Side, on_delete=models.DO_NOTHING, null=True, blank=True, related_name='attacker_side')
-    assister = models.ForeignKey(Player, on_delete=models.DO_NOTHING, null=True, blank=True, related_name='assister')
-    assister_side = models.ForeignKey(Side, on_delete=models.DO_NOTHING, null=True, blank=True, related_name='assister_side')
-    victim = models.ForeignKey(Player, on_delete=models.DO_NOTHING, related_name='victim')
-    victim_side = models.ForeignKey(Side, on_delete=models.DO_NOTHING, related_name='victim_side')
-    weapon = models.ForeignKey('Weapon', on_delete=models.DO_NOTHING, null=True, blank=True)
+    round = models.ForeignKey(
+        Round, on_delete=models.CASCADE, related_name="kills"
+    )
+    attacker = models.ForeignKey(
+        Player,
+        on_delete=models.DO_NOTHING,
+        null=True,
+        blank=True,
+        related_name="attacker",
+    )
+    attacker_side = models.ForeignKey(
+        Side,
+        on_delete=models.DO_NOTHING,
+        null=True,
+        blank=True,
+        related_name="attacker_side",
+    )
+    assister = models.ForeignKey(
+        Player,
+        on_delete=models.DO_NOTHING,
+        null=True,
+        blank=True,
+        related_name="assister",
+    )
+    assister_side = models.ForeignKey(
+        Side,
+        on_delete=models.DO_NOTHING,
+        null=True,
+        blank=True,
+        related_name="assister_side",
+    )
+    victim = models.ForeignKey(
+        Player, on_delete=models.DO_NOTHING, related_name="victim"
+    )
+    victim_side = models.ForeignKey(
+        Side, on_delete=models.DO_NOTHING, related_name="victim_side"
+    )
+    weapon = models.ForeignKey(
+        "Weapon", on_delete=models.DO_NOTHING, null=True, blank=True
+    )
     is_headshot = models.BooleanField()
     is_penetrated = models.BooleanField()
     is_in_air = models.BooleanField()
@@ -98,15 +139,23 @@ class PlayerInDemo(models.Model):
     crosshair_code = models.CharField(max_length=40)
     elo_old = models.IntegerField(null=True, blank=True)
     elo_new = models.IntegerField(null=True, blank=True)
-    rang = models.ForeignKey(MMRank, on_delete=models.DO_NOTHING, null=True, blank=True)
+    rang = models.ForeignKey(
+        MMRank, on_delete=models.DO_NOTHING, null=True, blank=True
+    )
 
 
 class ScoreBoard(models.Model):
-    player_in_demo = models.ForeignKey(PlayerInDemo, on_delete=models.DO_NOTHING)
+    player_in_demo = models.ForeignKey(
+        PlayerInDemo, on_delete=models.DO_NOTHING
+    )
     side = models.ForeignKey(Side, on_delete=models.DO_NOTHING)
 
-    buy_type = models.ForeignKey(BuyType, on_delete=models.DO_NOTHING, related_name='buy_type')
-    enemy_buy_type = models.ForeignKey(BuyType, on_delete=models.DO_NOTHING, related_name='emnemy_buy_type')
+    buy_type = models.ForeignKey(
+        BuyType, on_delete=models.DO_NOTHING, related_name="buy_type"
+    )
+    enemy_buy_type = models.ForeignKey(
+        BuyType, on_delete=models.DO_NOTHING, related_name="emnemy_buy_type"
+    )
 
     rounds = models.IntegerField()
 
@@ -148,8 +197,12 @@ class ScoreBoard(models.Model):
 
 class Duels(models.Model):
     demo = models.ForeignKey(Demo, on_delete=models.DO_NOTHING)
-    attacker_player = models.ForeignKey(Player, on_delete=models.DO_NOTHING, related_name='duel_attacker')
-    victim_player = models.ForeignKey(Player, on_delete=models.DO_NOTHING, related_name='duel_victim')
+    attacker_player = models.ForeignKey(
+        Player, on_delete=models.DO_NOTHING, related_name="duel_attacker"
+    )
+    victim_player = models.ForeignKey(
+        Player, on_delete=models.DO_NOTHING, related_name="duel_victim"
+    )
     kills = models.IntegerField()
     open_kills = models.IntegerField()
 
@@ -160,7 +213,10 @@ class WeaponType(models.Model):
 
 class Weapon(models.Model):
     name = models.CharField(max_length=32)
-    weapon_type = models.ForeignKey(WeaponType, on_delete=models.DO_NOTHING, null=True, blank=True)
+    weapon_type = models.ForeignKey(
+        WeaponType, on_delete=models.DO_NOTHING, null=True, blank=True
+    )
+    image = models.ImageField(null=True)
 
 
 class HitGroup(models.Model):
@@ -176,7 +232,9 @@ class PlayerWeaponStat(models.Model):
 
 
 class PlayerHitgroupStat(models.Model):
-    player_weapon_stat = models.ForeignKey(PlayerWeaponStat, on_delete=models.DO_NOTHING)
+    player_weapon_stat = models.ForeignKey(
+        PlayerWeaponStat, on_delete=models.DO_NOTHING
+    )
     hit_group = models.ForeignKey(HitGroup, on_delete=models.DO_NOTHING)
     damage = models.IntegerField()
     hits = models.IntegerField()

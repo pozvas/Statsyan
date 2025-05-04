@@ -65,6 +65,13 @@
         }
     },
     {
+        "model": "demo_database.Map",
+        "pk": 8,
+        "fields": {
+            "name": "de_vertigo"
+        }
+    },
+    {
         "model": "demo_database.MatchType",
         "pk": 1,
         "fields": {
@@ -106,7 +113,8 @@
         "fields": {
             "code": 1,
             "name": "TargetBombed",
-            "win_side": 2
+            "win_side": 2,
+            "image": "winreasons/bomb_exploded.svg"
         }
     },
     {
@@ -151,7 +159,8 @@
         "pk": 6,
         "fields": {
             "code": 6,
-            "name": "TerroristsStopped"
+            "name": "TerroristsStopped",
+            "image": "winreasons/ct_win.svg"
         }
     },
     {
@@ -160,7 +169,8 @@
         "fields": {
             "code": 7,
             "name": "BombDefused",
-            "win_side": 1
+            "win_side": 1,
+            "image": "winreasons/bomb_defused.svg"
         }
     },
     {
@@ -169,7 +179,8 @@
         "fields": {
             "code": 8,
             "name": "CTWin",
-            "win_side": 1
+            "win_side": 1,
+            "image": "winreasons/ct_win.svg"
         }
     },
     {
@@ -178,7 +189,8 @@
         "fields": {
             "code": 9,
             "name": "TerroristsWin",
-            "win_side": 2
+            "win_side": 2,
+            "image": "winreasons/t_win.svg"
         }
     },
     {
@@ -195,7 +207,8 @@
         "fields": {
             "code": 11,
             "name": "HostagesRescued",
-            "win_side": 1
+            "win_side": 1,
+            "image": "winreasons/ct_win.svg"
         }
     },
     {
@@ -204,7 +217,8 @@
         "fields": {
             "code": 12,
             "name": "TargetSaved",
-            "win_side": 1
+            "win_side": 1,
+            "image": "winreasons/stopwatch.svg"
         }
     },
     {
@@ -249,7 +263,8 @@
         "fields": {
             "code": 17,
             "name": "TerroristsSurrender",
-            "win_side": 1
+            "win_side": 1,
+            "image": "winreasons/ct_win.svg"
         }
     },
     {
@@ -258,7 +273,8 @@
         "fields": {
             "code": 18,
             "name": "CTSurrender",
-            "win_side": 2
+            "win_side": 2,
+            "image": "winreasons/t_win.svg"
         }
     },
     {
@@ -522,7 +538,8 @@
         "pk": 1,
         "fields": {
             "name": "weapon_revolver",
-            "weapon_type": 1
+            "weapon_type": 1,
+            "image": "weapons/revolver.png"
         }
     },
     {
@@ -530,7 +547,8 @@
         "pk": 2,
         "fields": {
             "name": "weapon_glock",
-            "weapon_type": 1
+            "weapon_type": 1,
+            "image": "weapons/glock.webp"
         }
     },
     {
@@ -538,7 +556,8 @@
         "pk": 3,
         "fields": {
             "name": "weapon_usp_silencer",
-            "weapon_type": 1
+            "weapon_type": 1,
+            "image": "weapons/usp_silencer.webp"
         }
     },
     {
@@ -546,7 +565,8 @@
         "pk": 4,
         "fields": {
             "name": "weapon_p250",
-            "weapon_type": 1
+            "weapon_type": 1,
+            "image": "weapons/p250.webp"
         }
     },
     {
@@ -554,7 +574,8 @@
         "pk": 5,
         "fields": {
             "name": "weapon_deagle",
-            "weapon_type": 1
+            "weapon_type": 1,
+            "image": "weapons/deagle.webp"
         }
     },
     {
@@ -562,7 +583,8 @@
         "pk": 6,
         "fields": {
             "name": "weapon_elite",
-            "weapon_type": 1
+            "weapon_type": 1,
+            "image": "weapons/elite.webp"
         }
     },
     {
@@ -570,7 +592,8 @@
         "pk": 7,
         "fields": {
             "name": "weapon_fiveseven",
-            "weapon_type": 1
+            "weapon_type": 1,
+            "image": "weapons/fiveseven.webp"
         }
     },
     {
@@ -578,7 +601,8 @@
         "pk": 8,
         "fields": {
             "name": "weapon_tec9",
-            "weapon_type": 1
+            "weapon_type": 1,
+            "image": "weapons/tec9.webp"
         }
     },
     {
@@ -586,7 +610,8 @@
         "pk": 9,
         "fields": {
             "name": "weapon_cz75a",
-            "weapon_type": 1
+            "weapon_type": 1,
+            "image": "weapons/cz75a.png"
         }
     },
     {
@@ -594,7 +619,8 @@
         "pk": 10,
         "fields": {
             "name": "weapon_hkp2000",
-            "weapon_type": 1
+            "weapon_type": 1,
+            "image": "weapons/hkp2000.webp"
         }
     },
     {
@@ -602,7 +628,8 @@
         "pk": 11,
         "fields": {
             "name": "weapon_nova",
-            "weapon_type": 2
+            "weapon_type": 2,
+            "image": "weapons/nova.png"
         }
     },
     {
@@ -610,7 +637,8 @@
         "pk": 12,
         "fields": {
             "name": "weapon_xm1014",
-            "weapon_type": 2
+            "weapon_type": 2,
+            "image": "weapons/xm1014.png"
         }
     },
     {
@@ -618,7 +646,8 @@
         "pk": 13,
         "fields": {
             "name": "weapon_mag7",
-            "weapon_type": 2
+            "weapon_type": 2,
+            "image": "weapons/mag7.webp"
         }
     },
     {
@@ -626,7 +655,8 @@
         "pk": 14,
         "fields": {
             "name": "weapon_sawedoff",
-            "weapon_type": 2
+            "weapon_type": 2,
+            "image": "weapons/sawedoff.png"
         }
     },
     {
@@ -634,7 +664,8 @@
         "pk": 15,
         "fields": {
             "name": "weapon_negev",
-            "weapon_type": 2
+            "weapon_type": 2,
+            "image": "weapons/negev.png"
         }
     },
     {
@@ -642,7 +673,8 @@
         "pk": 16,
         "fields": {
             "name": "weapon_m249",
-            "weapon_type": 2
+            "weapon_type": 2,
+            "image": "weapons/m249.png"
         }
     },
     {
@@ -650,7 +682,8 @@
         "pk": 17,
         "fields": {
             "name": "weapon_mac10",
-            "weapon_type": 3
+            "weapon_type": 3,
+            "image": "weapons/mac10.webp"
         }
     },
     {
@@ -658,7 +691,8 @@
         "pk": 18,
         "fields": {
             "name": "weapon_mp9",
-            "weapon_type": 3
+            "weapon_type": 3,
+            "image": "weapons/mp9.webp"
         }
     },
     {
@@ -666,7 +700,8 @@
         "pk": 19,
         "fields": {
             "name": "weapon_mp7",
-            "weapon_type": 3
+            "weapon_type": 3,
+            "image": "weapons/mp7.png"
         }
     },
     {
@@ -674,7 +709,8 @@
         "pk": 20,
         "fields": {
             "name": "weapon_ump45",
-            "weapon_type": 3
+            "weapon_type": 3,
+            "image": "weapons/ump45.webp"
         }
     },
     {
@@ -682,7 +718,8 @@
         "pk": 21,
         "fields": {
             "name": "weapon_p90",
-            "weapon_type": 3
+            "weapon_type": 3,
+            "image": "weapons/p90.png"
         }
     },
     {
@@ -690,7 +727,8 @@
         "pk": 22,
         "fields": {
             "name": "weapon_bizon",
-            "weapon_type": 3
+            "weapon_type": 3,
+            "image": "weapons/bizon.png"
         }
     },
     {
@@ -698,7 +736,8 @@
         "pk": 23,
         "fields": {
             "name": "weapon_mp5sd",
-            "weapon_type": 3
+            "weapon_type": 3,
+            "image": "weapons/mp5sd.png"
         }
     },
     {
@@ -706,7 +745,8 @@
         "pk": 24,
         "fields": {
             "name": "weapon_galilar",
-            "weapon_type": 4
+            "weapon_type": 4,
+            "image": "weapons/galilar.webp"
         }
     },
     {
@@ -714,7 +754,8 @@
         "pk": 25,
         "fields": {
             "name": "weapon_famas",
-            "weapon_type": 4
+            "weapon_type": 4,
+            "image": "weapons/famas.webp"
         }
     },
     {
@@ -722,7 +763,8 @@
         "pk": 26,
         "fields": {
             "name": "weapon_ak47",
-            "weapon_type": 4
+            "weapon_type": 4,
+            "image": "weapons/ak47.webp"
         }
     },
     {
@@ -730,7 +772,8 @@
         "pk": 27,
         "fields": {
             "name": "weapon_m4a1",
-            "weapon_type": 4
+            "weapon_type": 4,
+            "image": "weapons/m4a1.webp"
         }
     },
     {
@@ -738,7 +781,8 @@
         "pk": 28,
         "fields": {
             "name": "weapon_m4a1_silencer",
-            "weapon_type": 4
+            "weapon_type": 4,
+            "image": "weapons/m4a1_silencer.webp"
         }
     },
     {
@@ -746,7 +790,8 @@
         "pk": 29,
         "fields": {
             "name": "weapon_ssg08",
-            "weapon_type": 5
+            "weapon_type": 5,
+            "image": "weapons/ssg08.webp"
         }
     },
     {
@@ -754,7 +799,8 @@
         "pk": 30,
         "fields": {
             "name": "weapon_sg556",
-            "weapon_type": 4
+            "weapon_type": 4,
+            "image": "weapons/sg556.webp"
         }
     },
     {
@@ -762,7 +808,8 @@
         "pk": 31,
         "fields": {
             "name": "weapon_aug",
-            "weapon_type": 4
+            "weapon_type": 4,
+            "image": "weapons/aug.webp"
         }
     },
     {
@@ -770,7 +817,8 @@
         "pk": 32,
         "fields": {
             "name": "weapon_awp",
-            "weapon_type": 5
+            "weapon_type": 5,
+            "image": "weapons/awp.webp"
         }
     },
     {
@@ -778,7 +826,8 @@
         "pk": 33,
         "fields": {
             "name": "weapon_scar20",
-            "weapon_type": 5
+            "weapon_type": 5,
+            "image": "weapons/scar20.png"
         }
     },
     {
@@ -786,7 +835,8 @@
         "pk": 34,
         "fields": {
             "name": "weapon_g3sg1",
-            "weapon_type": 5
+            "weapon_type": 5,
+            "image": "weapons/g3sg1.webp"
         }
     },
     {
@@ -794,7 +844,8 @@
         "pk": 35,
         "fields": {
             "name": "weapon_knife",
-            "weapon_type": 6
+            "weapon_type": 6,
+            "image": "weapons/knife.webp"
         }
     },
     {
@@ -802,7 +853,8 @@
         "pk": 36,
         "fields": {
             "name": "weapon_taser",
-            "weapon_type": 6
+            "weapon_type": 6,
+            "image": "weapons/taser.png"
         }
     },
     {
@@ -810,7 +862,8 @@
         "pk": 37,
         "fields": {
             "name": "weapon_molotov",
-            "weapon_type": 7
+            "weapon_type": 7,
+            "image": "weapons/molotov.png"
         }
     },
     {
@@ -818,7 +871,8 @@
         "pk": 38,
         "fields": {
             "name": "weapon_flashbang",
-            "weapon_type": 7
+            "weapon_type": 7,
+            "image": "weapons/flashbang.webp"
         }
     },
     {
@@ -826,7 +880,8 @@
         "pk": 39,
         "fields": {
             "name": "weapon_hegrenade",
-            "weapon_type": 7
+            "weapon_type": 7,
+            "image": "weapons/hegrenade.webp"
         }
     },
     {
@@ -834,7 +889,8 @@
         "pk": 40,
         "fields": {
             "name": "weapon_decoy",
-            "weapon_type": 7
+            "weapon_type": 7,
+            "image": "weapons/decoy.png"
         }
     },
     {
@@ -842,7 +898,8 @@
         "pk": 41,
         "fields": {
             "name": "weapon_smokegrenade",
-            "weapon_type": 7
+            "weapon_type": 7,
+            "image": "weapons/smoke.png"
         }
     },
     {
@@ -850,7 +907,8 @@
         "pk": 42,
         "fields": {
             "name": "weapon_incgrenade",
-            "weapon_type": 7
+            "weapon_type": 7,
+            "image": "weapons/incgrenade.png"
         }
     },
     {
@@ -858,7 +916,8 @@
         "pk": 43,
         "fields": {
             "name": "weapon_inferno",
-            "weapon_type": 7
+            "weapon_type": 7,
+            "image": "weapons/inferno.webp"
         }
     },
     {

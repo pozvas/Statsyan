@@ -30,8 +30,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         executors = {
-            'default': ThreadPoolExecutor(20),  # Пул потоков
-            'processpool': ProcessPoolExecutor(5)  # Пул процессов
+            'default': ThreadPoolExecutor(20),
+            'processpool': ProcessPoolExecutor(5)
         }
         scheduler = BackgroundScheduler(executors=executors)
         scheduler.add_jobstore(DjangoJobStore(), "default")

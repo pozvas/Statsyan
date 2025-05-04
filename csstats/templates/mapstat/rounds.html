@@ -1,50 +1,130 @@
 {% extends "mapstat/main.html" %}
 {% block data %}
-<div id="accordion">
-    {% for round in rounds %}
-    <div class="card mb-3">
-        <div class="card-header" id="heading{{ round.round_number }}">
-            <h2 class="mb-0">
-                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse{{ round.round_number }}" aria-expanded="false" aria-controls="collapse{{ round.round_number }}">
-                    Round {{ round.round_number }}
-                </button>
-            </h2>
-        </div>
+{% load static %}
+{% load filters %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 
-        <div id="collapse{{ round.round_number }}" class="collapse" aria-labelledby="heading{{ round.round_number }}" data-parent="#accordion">
-            <div class="card-body">
-                <p><strong>Win Reason:</strong> {{ round.win_reason.name }}</p>
-                <p><strong>CT Team:</strong> {{ round.ct_team_name }}</p>
-                <p><strong>T Team:</strong> {{ round.t_team_name }}</p>
-                <p><strong>Kills T:</strong> {{ round.kills_t }}</p>
-                <p><strong>Kills CT:</strong> {{ round.kills_ct }}</p>
+<div class="d-flex flex-column align-items-center">
+    <div id="accordion" style="width: 100%; max-width: 800px;">
+        {% for round in rounds %}
+        {% if round.max_players == 5 and round.round_number == 13 or round.max_players == 2 and round.round_number == 9 %}
+            <p class="text-center my-2 w-100">Смена сторон</p>
+        {% endif %}
+        <div class="card mb-3 w-100">
+            <div class="card-header p-0 w-100">
+                <div class="d-flex flex-column w-100" data-toggle="collapse" data-target="#collapse{{ round.round_number }}" aria-expanded="false" aria-controls="collapse{{ round.round_number }}" style="cursor: pointer;">
+                    <!-- Номер раунда -->
+                    <div class="text-left py-2 pl-2">
+                        <h5 class="mb-0 font-weight-bold">Раунд {{ round.round_number }}</h5>
+                    </div>
+                    
+                    <!-- Основная информация -->
+                    <div class="d-flex align-items-center justify-content-between px-2 pb-2 w-100">
+                        <!-- Левая часть (CT) -->
+                        <div class="d-flex align-items-center">
+                            <div class="d-flex align-items-center mr-1">
+                                {% for i in round.deaths_1|range_from_zero %}
+                                    <img src="{% static "round/player-dead.png" %}" alt="player-dead" class="img-fluid" style="height: 24px;">
+                                {% endfor %}
+                                {% for i in round.max_players|subtract:round.deaths_1|range_from_zero %}
+                                    <img src="{% static "round/player.png" %}" alt="Alive" class="img-fluid" style="height: 24px;">
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <!-- Центральная часть (счет + иконка) -->
+                        <div class="d-flex align-items-center">
 
-                <h3>Kills in Round {{ round.round_number }}</h3>
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Attacker</th>
-                            <th>Victim</th>
-                            <th>Weapon</th>
-                            <th>Headshot</th>
-                            <th>Time</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for kill in round.kills.all %}
-                            <tr>
-                                <td>{{ kill.attacker.last_nickname }}</td>
-                                <td>{{ kill.victim.last_nickname }}</td>
-                                <td>{{ kill.weapon.name }}</td>
-                                <td>{{ kill.is_headshot|yesno:"Yes,No" }}</td>
-                                <td>{{ kill.kill_time }}</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                            <div class="mx-1">
+                                <p class="mb-0 h4 font-weight-bold {% if round.win_team == teams_name.0 and round.win_reason.win_side.code == "TERRORIST" %} text-warning {% elif round.win_team == teams_name.0 and round.win_reason.win_side.code == "CT"%} text-primary {% endif %}">{{ round.wins_1 }}</p>
+                            </div>
+                            
+                            <div class="d-flex flex-column align-items-center mx-1">
+                                <img src="{% static round.win_reason.image %}" alt="Win Reason" class="img-fluid" style="height: 28px;">
+                            </div>
+                            
+                            <div class="mx-1">
+                                <p class="mb-0 h4 font-weight-bold {% if round.win_team == teams_name.1 and round.win_reason.win_side.code == "TERRORIST" %} text-warning {% elif round.win_team == teams_name.1 and round.win_reason.win_side.code == "CT"%} text-primary {% endif %}">{{ round.wins_2 }}</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Правая часть (T) -->
+                        <div class="d-flex align-items-center">
+                            <div class="d-flex align-items-center ml-1">
+                                {% for i in round.max_players|subtract:round.deaths_2|range_from_zero %}
+                                    <img src="{% static "round/player.png" %}" alt="Alive" class="img-fluid" style="height: 24px;">
+                                {% endfor %}
+                                {% for i in round.deaths_2|range_from_zero %}
+                                    <img src="{% static "round/player-dead.png" %}" alt="player-dead" class="img-fluid" style="height: 24px;">
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="collapse{{ round.round_number }}" class="collapse" aria-labelledby="heading{{ round.round_number }}" data-parent="#accordion">
+                <div class="card-body">
+                    <div class="container-fluid">
+                        <div class="list-group">
+                            {% for kill in round.kills.all %}
+                                <div class="list-group-item d-flex align-items-center bg-dark text-light p-2 gap-3 flex-wrap">
+                                    <span>{{ kill.kill_time|get_time }}</span>
+
+                                    {% if kill.is_blind %}
+                                        <div class="flex-shrink-0">
+                                            <img src="{% static "killfeed/shooter_blind.webp" %}" alt="Blind" style="width: auto; height: 24px;">
+                                        </div>
+                                    {% endif %}
+
+                                    <span class="{% if kill.attacker_side.code == 'CT' %}text-primary{% else %}text-warning{% endif %}">{{ kill.attacker.last_nickname }}</span>
+                                    
+                                    {% if kill.assister %}
+                                        <span>+</span>
+                                        <span class="{% if kill.assister_side.code == 'CT' %}text-primary{% else %}text-warning{% endif %}">{{ kill.assister.last_nickname }}</span>
+                                    {% endif %}
+
+                                    {% comment %} {% if kill.is_in_air %}
+                                        <i class="fas fa-feather-alt icon text-info"></i>
+                                    {% endif %} {% endcomment %}
+
+                                    <div class="flex-shrink-0">
+                                        <img src="{% static kill.weapon.image %}" alt="Weapon Icon" style="width: auto; height: 24px;">
+                                    </div>
+
+                                    {% if kill.is_no_scope %}
+                                        <div class="flex-shrink-0">
+                                            <img src="{% static "killfeed/noscope.webp" %}" alt="Headshot" style="width: auto; height: 24px;">
+                                        </div>
+                                    {% endif %}
+
+                                    {% if kill.is_smoke %}
+                                        <div class="flex-shrink-0">
+                                            <img src="{% static "killfeed/through_smoke.png" %}" alt="Headshot" style="width: auto; height: 24px;">
+                                        </div>
+                                    {% endif %}
+
+                                    {% if kill.is_penetrated %}
+                                        <div class="flex-shrink-0">
+                                            <img src="{% static "killfeed/penetration.png" %}" alt="Headshot" style="width: auto; height: 24px;">
+                                        </div>
+                                    {% endif %}
+
+                                    {% if kill.is_headshot %}
+                                        <div class="flex-shrink-0">
+                                            <img src="{% static "killfeed/headshot.webp" %}" alt="Headshot" style="width: auto; height: 24px;">
+                                        </div>
+                                    {% endif %}
+                                    
+                                    <span class="{% if kill.victim_side.code == 'CT' %}text-primary{% else %}text-warning{% endif %}">{{ kill.victim.last_nickname }}</span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
+        {% endfor %}
     </div>
-    {% endfor %}
 </div>
 {% endblock %}

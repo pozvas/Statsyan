@@ -5,7 +5,10 @@
       Заголовок
     </div>
     <div>
-      {% if user.is_authenticated %}
+      {% if user.is_superuser %}
+        <a class="text-reset text-decoration-none">Вошли как суперпользователь</a>
+        <a href="{% url 'logout' %}">Выйти</a>
+      {% elif user.is_authenticated %}
           {% if steam_player.last_avatar %}
               <img src="{{ steam_player.last_avatar }}" alt="Аватар {{ steam_player.last_nickname }}" class="avatar">
           {% endif %}

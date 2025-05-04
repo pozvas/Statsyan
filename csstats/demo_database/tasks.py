@@ -15,13 +15,22 @@ import bz2
 from csstats.settings import ZIP_STTORAGE, UNZIP_STTORAGE
 
 
-BOT_PORT = config('BOT_PORT')
+BOT_PORT = config("BOT_PORT")
+
+
+def sql_func(sql):
+    with connection.cursor() as cursor:
+        cursor.execute(sql)
 
 
 def debug_func():
     with connection.cursor() as cursor:
-        cursor.execute("UPDATE demo_database_player SET auth_code = '9TCA-NV8HM-LVQE', last_match_steam_sharecode = 'CSGO-GNKXq-cKp5a-HedPq-n7uaX-85syM' WHERE steamid = 76561199467171390")
-        cursor.execute("UPDATE demo_database_player SET last_match_steam_sharecode = 'CSGO-GNKXq-cKp5a-HedPq-n7uaX-85syM' WHERE steamid = 76561198305227842")
+        cursor.execute(
+            "UPDATE demo_database_player SET auth_code = '9TCA-NV8HM-LVQE', last_match_steam_sharecode = 'CSGO-GNKXq-cKp5a-HedPq-n7uaX-85syM' WHERE steamid = 76561199467171390"
+        )
+        cursor.execute(
+            "UPDATE demo_database_player SET last_match_steam_sharecode = 'CSGO-GNKXq-cKp5a-HedPq-n7uaX-85syM' WHERE steamid = 76561198305227842"
+        )
 
 
 def get_new_sharecodes(player_id):
@@ -30,13 +39,12 @@ def get_new_sharecodes(player_id):
     new_codes = []
     while True:
         new_code = get_next_match_code_by_player(
-            code=current_code,
-            steamid=player.pk,
-            steamidkey=player.auth_code
+            code=current_code, steamid=player.pk, steamidkey=player.auth_code
         )
         if not new_code:
-            #player.last_match_steam_sharecode = current_code
-            #player.save()
+            if current_code is not None:
+                player.last_match_steam_sharecode = current_code
+                player.save()
             break
         new_codes.append(new_code)
         current_code = new_code
@@ -46,14 +54,15 @@ def get_new_sharecodes(player_id):
 
 def process_demo(sharecode):
     try:
-        response_from_bot = requests.get(f'http://127.0.0.1:{BOT_PORT}/getDemoLink', params={
-            'sharecode': sharecode
-        })
+        response_from_bot = requests.get(
+            f"http://127.0.0.1:{BOT_PORT}/getDemoLink",
+            params={"sharecode": sharecode},
+        )
         response_from_bot.raise_for_status()
         data = response_from_bot.json()
-        demo_url = data['matchData']['matchUrl']
-        demo_time = datetime.fromtimestamp(data['matchData']['matchTime'])
-        file_name = demo_url.split('/')[-1]
+        demo_url = data["matchData"]["matchUrl"]
+        demo_time = datetime.fromtimestamp(data["matchData"]["matchTime"])
+        file_name = demo_url.split("/")[-1]
         download_dir = ZIP_STTORAGE
 
         os.makedirs(download_dir, exist_ok=True)
@@ -63,7 +72,7 @@ def process_demo(sharecode):
         response = requests.get(demo_url, stream=True)
         response.raise_for_status()
 
-        with open(file_path, 'wb') as file:
+        with open(file_path, "wb") as file:
             for chunck in response.iter_content(chunk_size=8192):
                 file.write(chunck)
 
@@ -72,14 +81,13 @@ def process_demo(sharecode):
         extracted_dir = UNZIP_STTORAGE
         os.makedirs(extracted_dir, exist_ok=True)
 
-        with open(file_path, 'rb') as compressed_file:
+        with open(file_path, "rb") as compressed_file:
             decompressed_data = bz2.decompress(compressed_file.read())
 
         extracted_path = os.path.join(
-            extracted_dir,
-            file_name.replace('.bz2', '')
+            extracted_dir, file_name.replace(".bz2", "")
         )
-        with open(extracted_path, 'wb') as decompressed_file:
+        with open(extracted_path, "wb") as decompressed_file:
             decompressed_file.write(decompressed_data)
 
         print(f"Файл распакован в {extracted_path}")
@@ -90,7 +98,7 @@ def process_demo(sharecode):
         print(f"Ошибка при скачивании файла: {e}")
 
     except Exception as e:
-        print(f'Ошибка распаковки файла: {e}')
+        print(f"Ошибка распаковки файла: {e}")
 
     finally:
         if os.path.exists(file_path):
@@ -101,9 +109,9 @@ def process_demo(sharecode):
 
 def get_and_analize_new_demos():
     players_ids = Player.objects.filter(
-        Q(last_match_steam_sharecode__isnull=False) &
-        Q(auth_code__isnull=False)
-    ).values_list('pk', flat=True)
+        Q(last_match_steam_sharecode__isnull=False)
+        & Q(auth_code__isnull=False)
+    ).values_list("pk", flat=True)
 
     games_codes = []
     with ThreadPoolExecutor(max_workers=4) as executor:
@@ -145,4 +153,3 @@ def get_and_analize_new_demos():
 #         gevent.sleep(1)
 
 #     print(REDIS_CLIENT.smembers("unique_codes"))
-

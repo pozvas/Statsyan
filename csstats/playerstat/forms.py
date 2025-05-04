@@ -8,4 +8,5 @@ class PlayerCodeForm(forms.ModelForm):
         fields = ('auth_code', 'last_match_steam_sharecode')
         labels = {
             'auth_code': 'Код аунтефикации',
+            'last_match_steam_sharecode': 'Код последнего сыгранного матча',
         }

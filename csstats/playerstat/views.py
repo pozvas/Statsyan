@@ -141,6 +141,9 @@ class AuthCodeUpdateView(SteamUserBaseMixin, LoginRequiredMixin, UpdateView):
         if not request.user.is_authenticated:
             return redirect('social:begin', 'steam')
 
+        if self.request.user.is_superuser:
+            return redirect('csstats:home')
+
         if self.get_object().pk != UserSocialAuth.objects.get(user=self.request.user).uid:
             return redirect('playerstat:stats', self.kwargs['player_id'])
         return super().dispatch(request, *args, **kwargs)
