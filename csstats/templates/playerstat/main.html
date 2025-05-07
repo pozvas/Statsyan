@@ -36,6 +36,11 @@
             Игры
           </a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.resolver_match.url_name == 'weapons' %}active{% endif %}" href="{% url 'playerstat:weapons' player.pk %}">
+            Оружия
+          </a>
+        </li>
       </ul>
     </div>
   </nav>
@@ -88,9 +93,11 @@
             <div class="col-md-2">
                 <label for="max_rating" class="form-label">Рейтинг до</label>
                 <input type="number" step="0.01" min="0" max="10" class="form-control" 
-                       id="max_rating" name="max_rating" placeholder="2.00"
+                       id="max_rating" name="max_rating" placeholder="3.00"
                        value="{{ request.GET.max_rating }}">
             </div>
+
+            {% block filters %}{% endblock %}
             
             <!-- Кнопки -->
             <div class="col-md-12 d-flex justify-content-end align-items-end">

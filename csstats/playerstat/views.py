@@ -1,3 +1,4 @@
+from django.db import connection
 from django.utils import timezone
 import datetime
 from typing import Any
@@ -14,6 +15,7 @@ from demo_database.models import (
     Player,
     Round,
     KillsInRound,
+    WeaponType,
 )
 from django.db.models import Sum, Avg, Q, Count, Prefetch, F
 from django.core.files.storage import default_storage
@@ -37,46 +39,9 @@ class PlayerMatchesView(PlayerListMixin, ListView):
 
     def get_queryset(self) -> QuerySet[Any]:
         demos = super().get_queryset()
-
-        start_date_filter = self.request.GET.get("start_date")
-        end_date_filter = self.request.GET.get("end_date")
-        map_filter = self.request.GET.get("map")
-        mode_filter = self.request.GET.get("mode")
-        min_rating_filter = self.request.GET.get("min_rating")
-        max_rating_filter = self.request.GET.get("max_rating")
-
-        filters = Q()
-
-        if start_date_filter:
-            start_date_filter = timezone.datetime.strptime(
-                start_date_filter, "%Y-%m-%d"
-            ).date()
-            filters = filters & Q(demo__data_played__gte=start_date_filter)
-
-        if end_date_filter:
-            end_date_filter = timezone.datetime.strptime(
-                end_date_filter, "%Y-%m-%d"
-            ).date()
-            end_date_filter = timezone.make_aware(
-                datetime.datetime.combine(end_date_filter, datetime.time.max)
-            )
-            filters = filters & Q(demo__data_played__lte=end_date_filter)
-
-        if map_filter:
-            filters = filters & Q(demo__map=map_filter)
-
-        if mode_filter:
-            filters = filters & Q(demo__match_type=mode_filter)
-
-        if min_rating_filter:
-            filters = filters & Q(rating__gte=float(min_rating_filter))
-
-        if max_rating_filter:
-            filters = filters & Q(rating__lte=float(max_rating_filter))
-
         return (
             PlayerInDemo.objects.filter(
-                Q(demo__in=demos) & Q(player=self.player)
+                Q(demo_id__in=demos) & Q(player=self.player)
             )
             .select_related("rang", "demo", "demo__map", "demo__match_type")
             .annotate(
@@ -112,7 +77,6 @@ class PlayerMatchesView(PlayerListMixin, ListView):
                     + 0.1587
                 ),
             )
-            .filter(filters)
             .order_by("-demo__data_played")
         )
 
@@ -212,3 +176,86 @@ class AuthCodeUpdateView(SteamUserBaseMixin, LoginRequiredMixin, UpdateView):
         return reverse(
             "playerstat:stats", kwargs={"player_id": self.kwargs["player_id"]}
         )
+
+
+class PlayerWeaponView(PlayerListMixin, ListView):
+    template_name = "playerstat/weapons.html"
+    context_object_name = "weapons"
+
+    def get_queryset(self) -> QuerySet[Any]:
+        demos = super().get_queryset()
+        self.weapon_types = WeaponType.objects.all()
+
+        side_filter = self.request.GET.get("side")
+        weapon_type_filter = self.request.GET.get("weapon_type")
+
+        filters = Q(
+            weapon_player_stat__isnull=False,
+            weapon_player_stat__hitgroup_stat__isnull=False,
+        )
+
+        if side_filter:
+            filters = filters & Q(weapon_player_stat__side=side_filter)
+
+        if weapon_type_filter:
+            filters = filters & Q(weapon_type=weapon_type_filter)
+
+        # изменить когда перейду на постре и для карт
+        # SELECT
+        #     w.id,
+        #     w.name,
+        #     w.caption,
+        #     w.weapon_type_id,
+        #     w.image,
+        #     SUM(pws.fires_count) AS fires,
+        #     phs.damage,
+        #     phs.kills,
+        #     phs.hits,
+        #     SUM(CASE WHEN hg.name = 'head' THEN phs.hits ELSE 0 END) AS headshots
+        # FROM demo_database_weapon w
+        # JOIN demo_database_playerweaponstat pws ON w.id = pws.weapon_id
+        # JOIN LATERAL (
+        #     SELECT
+        #     SUM(phs1.damage) AS damage,
+        #     SUM(phs1.kills) AS kills,
+        #     SUM(phs1.hits) AS hits
+        #     FROM demo_database_playerhitgroupstat phs1
+        #     WHERE pws.id = phs1.player_weapon_stat_id
+        # ) phs ON TRUE
+
+        query = f"""
+        SELECT
+            w.id,
+            w.name,
+            w.caption,
+            w.weapon_type_id,
+            w.image,
+            SUM(DISTINCT pws.fires_count) AS fires,
+            SUM(phs.damage) AS damage,
+            SUM(phs.kills) AS kills,
+            SUM(phs.hits) AS hits,
+            SUM(CASE WHEN hg.name = 'head' THEN phs.hits ELSE 0 END) AS headshots
+        FROM demo_database_weapon w
+        JOIN demo_database_playerweaponstat pws ON w.id = pws.weapon_id
+        JOIN demo_database_playerhitgroupstat phs ON pws.id = phs.player_weapon_stat_id
+        LEFT JOIN demo_database_playerindemo pid ON pid.demo_id = pws.demo_id AND pid.player_id = pws.player_id
+        LEFT JOIN demo_database_hitgroup hg ON phs.hit_group_id = hg.id
+        WHERE pws.demo_id in ({",".join(str(demo["id"]) for demo in demos)}) 
+        {f"AND pws.side_id = {side_filter}" if side_filter else ""}
+        {f"AND w.weapon_type_id = {weapon_type_filter}" if weapon_type_filter else ""}
+        GROUP BY w.id, w.name, w.caption, w.weapon_type_id, w.image
+        """
+
+        with connection.cursor() as cursor:
+            cursor.execute(
+                query,
+            )
+            columns = [col[0] for col in cursor.description]
+            results = [dict(zip(columns, row)) for row in cursor.fetchall()]
+
+            return results
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        contex = super().get_context_data(**kwargs)
+        contex["weapon_types"] = self.weapon_types
+        return contex

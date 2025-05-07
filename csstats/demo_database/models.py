@@ -1,4 +1,7 @@
 from django.db import models
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
 class Player(models.Model):
@@ -54,6 +57,7 @@ class Demo(models.Model):
     score_lose = models.SmallIntegerField()
     map = models.ForeignKey(Map, on_delete=models.DO_NOTHING)
     match_type = models.ForeignKey(MatchType, on_delete=models.DO_NOTHING)
+    uploaded_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 
 
 class Round(models.Model):
@@ -131,11 +135,16 @@ class KillsInRound(models.Model):
 class MMRank(models.Model):
     code = models.IntegerField()
     name = models.CharField(max_length=32)
+    image = models.ImageField(null=True)
 
 
 class PlayerInDemo(models.Model):
-    player = models.ForeignKey(Player, on_delete=models.DO_NOTHING)
-    demo = models.ForeignKey(Demo, on_delete=models.CASCADE)
+    player = models.ForeignKey(
+        Player, on_delete=models.DO_NOTHING, related_name="demos"
+    )
+    demo = models.ForeignKey(
+        Demo, on_delete=models.CASCADE, related_name="players"
+    )
     team = models.CharField(max_length=20)
     crosshair_code = models.CharField(max_length=40)
     elo_old = models.IntegerField(null=True, blank=True)

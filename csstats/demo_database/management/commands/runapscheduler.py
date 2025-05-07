@@ -30,34 +30,30 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         executors = {
-            'default': ThreadPoolExecutor(20),
-            'processpool': ProcessPoolExecutor(5)
+            "default": ThreadPoolExecutor(20),
+            "processpool": ProcessPoolExecutor(5),
         }
         scheduler = BackgroundScheduler(executors=executors)
         scheduler.add_jobstore(DjangoJobStore(), "default")
 
         scheduler.add_job(
             get_and_analize_new_demos_job,
-            trigger=CronTrigger(
-                hour="00", minute="00"
-            ),
-            id='get_and_analize_new_demos',
+            "cron",
+            hour=00,
+            minute=00,
+            id="get_and_analize_new_demos",
             replace_existing=True,
         )
-        logger.info("Added job 'my_job'.")
+        logger.info("Added job 'get_and_analize_new_demos_job'.")
 
         scheduler.add_job(
             delete_old_job_executions,
-            trigger=CronTrigger(
-                day_of_week="mon", hour="00", minute="00"
-            ),
+            trigger=CronTrigger(day_of_week="mon", hour="00", minute="00"),
             id="delete_old_job_executions",
             max_instances=1,
             replace_existing=True,
         )
-        logger.info(
-            "Added weekly job: 'delete_old_job_executions'."
-        )
+        logger.info("Added weekly job: 'delete_old_job_executions'.")
 
         try:
             logger.info("Starting scheduler...")

@@ -17,12 +17,10 @@ class DemoMixin(SteamUserBaseMixin):
         self.teams_name = [item["team"] for item in players_by_team]
 
         self.team_a_players = Player.objects.filter(
-            Q(playerindemo__team=self.teams_name[0])
-            & Q(playerindemo__demo=self.demo)
+            Q(demos__team=self.teams_name[0]) & Q(demos__demo=self.demo)
         )
         self.team_b_players = Player.objects.filter(
-            Q(playerindemo__team=self.teams_name[1])
-            & Q(playerindemo__demo=self.demo)
+            Q(demos__team=self.teams_name[1]) & Q(demos__demo=self.demo)
         )
         return None
 

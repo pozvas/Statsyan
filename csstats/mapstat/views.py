@@ -2,6 +2,7 @@ from typing import Any
 from django.db import connection
 from django.db.models.query import QuerySet
 from django.shortcuts import render, get_object_or_404
+import os
 from mapstat.mixins import DemoMixin
 from demo_database.models import (
     Demo,
@@ -232,12 +233,28 @@ class DemoRoundsView(DemoMixin, ListView):
                     default=F("t_team_name"),
                     output_field=CharField(),
                 ),
+                win_buy=Case(
+                    When(
+                        win_reason__win_side__code="CT",
+                        then=F("ct_buy_type__name"),
+                    ),
+                    default=F("t_buy_type__name"),
+                    output_field=CharField(),
+                ),
                 lose_team=Case(
                     When(
                         win_reason__win_side__code="CT",
                         then=F("t_team_name"),
                     ),
                     default=F("ct_team_name"),
+                    output_field=CharField(),
+                ),
+                lose_buy=Case(
+                    When(
+                        win_reason__win_side__code="CT",
+                        then=F("t_buy_type__name"),
+                    ),
+                    default=F("ct_buy_type__name"),
                     output_field=CharField(),
                 ),
             )
@@ -428,8 +445,14 @@ def upload_demo(request):
         file_path = default_storage.save(
             uploaded_file.name, ContentFile(uploaded_file.read())
         )
+        file_modification_time = request.POST.get("file_mtime")
+
         absolute_file_path = default_storage.path(file_path)
         try:
+            if file_modification_time:
+                mod_time = float(file_modification_time)
+                os.utime(absolute_file_path, (mod_time, mod_time))
+
             demo = save_demo(absolute_file_path)
             return HttpResponseRedirect(
                 reverse("mapstat:demo", kwargs={"demo_id": demo})
