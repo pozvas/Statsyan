@@ -26,9 +26,6 @@ def sql_func(sql):
 def debug_func():
     with connection.cursor() as cursor:
         cursor.execute(
-            "UPDATE demo_database_player SET auth_code = '9TCA-NV8HM-LVQE', last_match_steam_sharecode = 'CSGO-GNKXq-cKp5a-HedPq-n7uaX-85syM' WHERE steamid = 76561199467171390"
-        )
-        cursor.execute(
             "UPDATE demo_database_player SET last_match_steam_sharecode = 'CSGO-GNKXq-cKp5a-HedPq-n7uaX-85syM' WHERE steamid = 76561198305227842"
         )
 
@@ -54,6 +51,10 @@ def get_new_sharecodes(player_id):
 
 def process_demo(sharecode):
     try:
+        demo = Demo.objects.filter(sharecode=sharecode)
+        if demo.first() is not None:
+            return
+
         response_from_bot = requests.get(
             f"http://127.0.0.1:{BOT_PORT}/getDemoLink",
             params={"sharecode": sharecode},
@@ -122,34 +123,3 @@ def get_and_analize_new_demos():
 
     with ThreadPoolExecutor(max_workers=4) as executor:
         executor.map(process_demo, games_codes_set)
-
-
-# def get_new_sharecodes(self, player_id):
-#     player = Player.objects.get(pk=player_id)
-#     current_code = player.last_match_steam_sharecode
-#     new_codes = []
-#     while True:
-#         new_code = get_next_match_code_by_player(
-#             code=current_code,
-#             steamid=player.pk,
-#             steamidkey=player.auth_code
-#         )
-#         if not new_code:
-#             player.last_match_steam_sharecode = current_code
-#             player.save()
-#             break
-#         new_codes.append(new_code)
-#         current_code = new_code
-
-#     REDIS_CLIENT.sadd("new_sharecodes", *new_codes)
-#     return new_codes
-
-# @shared_task
-# def get_new_demos():
-#     players_ids = Player.objects.filter(last_match_steam_sharecode__isnull=False).values_list('pk', flat=True)
-#     group_result = group(get_new_sharecodes.s(id) for id in players_ids).apply_async()
-
-#     while not group_result.ready():
-#         gevent.sleep(1)
-
-#     print(REDIS_CLIENT.smembers("unique_codes"))

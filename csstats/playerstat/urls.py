@@ -20,4 +20,9 @@ urlpatterns = [
         views.AuthCodeUpdateView.as_view(),
         name="auth_code",
     ),
+    path(
+        "<int:player_id>/graphs",
+        views.PlayerGraphsView.as_view(),
+        name="graphs",
+    ),
 ]

@@ -1,0 +1,195 @@
+{% extends "playerstat/main.html" %}
+{% load django_bootstrap5 %}
+{% load filters %}
+{% load tags %}
+
+{% block filters %}
+<div class="row g-3">
+  <div class="col-md-4">
+      <label for="side" class="form-label">Фильтр по стороне:</label>
+      <select id="side" name="side" class="form-select">
+          <option value="">Всё</option>
+          {% for side in sides %}
+              <option value="{{ side.id }}" {% if request.GET.side == side.id|stringformat:"s" %}selected{% endif %}>{{ side.name }}</option>
+          {% endfor %}
+      </select>
+  </div>
+  <div class="col-md-4">
+      <label for="buy_type" class="form-label">Фильтр по типу закупки:</label>
+      <select id="buy_type" name="buy_type" class="form-select">
+          <option value="">Всё</option>
+          {% for buy_type in buy_types %}
+              <option value="{{ buy_type.id }}" {% if request.GET.buy_type == buy_type.id|stringformat:"s" %}selected{% endif %}>{{ buy_type.name }}</option>
+          {% endfor %}
+      </select>
+  </div>
+  <div class="col-md-4">
+      <label for="enemy_buy_type" class="form-label">Фильтр по типу закупки оппонента:</label>
+      <select id="enemy_buy_type" name="enemy_buy_type" class="form-select">
+          <option value="">Всё</option>
+          {% for buy_type in buy_types %}
+              <option value="{{ buy_type.id }}" {% if request.GET.enemy_buy_type == buy_type.id|stringformat:"s" %}selected{% endif %}>{{ buy_type.name }}</option>
+          {% endfor %}
+      </select>
+  </div>
+</div>
+{% endblock %}
+
+{% block data %}
+<div class="container py-4">
+  <div class="metric-selection mb-4">
+      <h4 class="mb-3">Выберите две метрики:</h4>
+      <div class="form-check form-check-inline">
+          <input class="form-check-input" type="checkbox" id="elo" name="metric" value="elo">
+          <label class="form-check-label" for="elo">Очки рейтинга</label>
+      </div>
+      <div class="form-check form-check-inline">
+          <input class="form-check-input" type="checkbox" id="rating" name="metric" value="rating">
+          <label class="form-check-label" for="rating">Rating 2.0</label>
+      </div>
+      <div class="form-check form-check-inline">
+          <input class="form-check-input" type="checkbox" id="adr" name="metric" value="adr">
+          <label class="form-check-label" for="adr">ADR</label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="checkbox" id="kdr" name="metric" value="kdr">
+        <label class="form-check-label" for="kdr">KDR</label>
+    </div>
+    <div class="form-check form-check-inline">
+      <input class="form-check-input" type="checkbox" id="kast" name="metric" value="kast">
+      <label class="form-check-label" for="kast">KAST</label>
+    </div>
+  </div>
+
+  <div class="row">
+      <div class="col-12">
+          <div class="card shadow-sm">
+              <div class="card-body p-0">
+                  <div class="chart-container p-3">
+                      <canvas id="myChart"></canvas>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('myChart');
+      
+        const metricsData = {
+          elo: {
+            label: 'Elo',
+            data: JSON.parse('{{ elo|escapejs }}'),
+          },
+          rating: {
+            label: 'Rating 2.0',
+            data: JSON.parse('{{ rating|escapejs }}'),
+          },
+          adr: {
+            label: 'ADR',
+            data: JSON.parse('{{ adr|escapejs }}'),
+          },
+          kast: {
+            label: 'KAST',
+            data: JSON.parse('{{ kast|escapejs }}'),
+          },
+          kdr: {
+            label: 'KDR',
+            data: JSON.parse('{{ kdr|escapejs }}'),
+          }
+        };
+      
+        const allXValues = Array.from(new Set([
+          ...metricsData.elo.data.map(item => item.x),
+          ...metricsData.rating.data.map(item => item.x),
+          ...metricsData.adr.data.map(item => item.x),
+          ...metricsData.kast.data.map(item => item.x),
+          ...metricsData.kdr.data.map(item => item.x),
+        ])).sort((a, b) => new Date(a) - new Date(b));
+      
+        function alignData(metricData) {
+          return allXValues.map(x => {
+            const foundItem = metricData.find(item => item.x === x);
+            return foundItem ? foundItem.y : null;
+          });
+        }
+      
+        const chart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: allXValues,
+            datasets: []
+          },
+          options: {
+            spanGaps: false,
+            responsive: true,
+            scales: {
+              y_left: {
+                type: 'linear',
+                position: 'left',
+                display: false,
+                title: { display: false }
+              },
+              y_right: {
+                type: 'linear',
+                position: 'right',
+                display: false,
+                grid: { drawOnChartArea: false },
+                title: { display: false }
+              },
+            }
+          }
+        });
+      
+        let selectedMetrics = [];
+        document.querySelectorAll('input[name="metric"]').forEach(checkbox => {
+          checkbox.addEventListener('change', function() {
+            if (this.checked) {
+              if (selectedMetrics.length >= 2) {
+                this.checked = false;
+                alert('Можно выбрать только 2 метрики');
+                return;
+              }
+              selectedMetrics.push(this.value);
+            } else {
+              selectedMetrics = selectedMetrics.filter(m => m !== this.value);
+            }
+            updateChart();
+          });
+        });
+      
+        function updateChart() {
+          chart.data.datasets = selectedMetrics.map((metricId, index) => {
+            const metric = metricsData[metricId];
+            return {
+              label: metric.label,
+              data: alignData(metric.data),
+              borderColor: index === 0 ? "#2e11d4" : "#e30b0b",
+              borderWidth: metric.borderWidth || 1,
+              yAxisID: index === 0 ? 'y_left' : 'y_right'
+            };
+          });
+      
+          chart.options.scales.y_left.display = selectedMetrics.length > 0;
+          chart.options.scales.y_right.display = selectedMetrics.length > 1;
+          
+          if (selectedMetrics.length >= 1) {
+            chart.options.scales.y_left.title.text = metricsData[selectedMetrics[0]].label;
+            chart.options.scales.y_left.title.display = true;
+          }
+          if (selectedMetrics.length >= 2) {
+            chart.options.scales.y_right.title.text = metricsData[selectedMetrics[1]].label;
+            chart.options.scales.y_right.title.display = true;
+          }
+      
+          chart.update();
+        }
+        window.addEventListener('resize', function() {
+          chart.resize();
+        });
+      });
+      
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}

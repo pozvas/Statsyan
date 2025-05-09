@@ -9,6 +9,7 @@ class Player(models.Model):
     auth_code = models.CharField(max_length=50, null=True, blank=True)
     last_nickname = models.CharField(max_length=32)
     last_avatar = models.CharField(max_length=255)
+    last_avatar_big = models.CharField(max_length=255)
     date_check = models.DateTimeField(auto_now_add=True)
     last_match_steam_sharecode = models.CharField(
         max_length=50, null=True, blank=True
@@ -155,7 +156,9 @@ class PlayerInDemo(models.Model):
 
 
 class ScoreBoard(models.Model):
-    player_in_demo = models.ForeignKey(PlayerInDemo, on_delete=models.CASCADE)
+    player_in_demo = models.ForeignKey(
+        PlayerInDemo, on_delete=models.CASCADE, related_name="scoreboard"
+    )
     side = models.ForeignKey(Side, on_delete=models.DO_NOTHING)
 
     buy_type = models.ForeignKey(
@@ -168,6 +171,7 @@ class ScoreBoard(models.Model):
     rounds = models.IntegerField()
 
     kills = models.SmallIntegerField()
+    headshots = models.SmallIntegerField()
     assists = models.SmallIntegerField()
     deaths = models.SmallIntegerField()
 

@@ -31,4 +31,20 @@ def subtract(value, arg):
 
 @register.filter(name="divide_02")
 def divide_02(value, arg):
-    return f"{(value / arg * 100):.2f}"
+    if arg == 0:
+        return f"{(value / 1.0 * 100):.2f}"
+    return f"{(value * 100.0 / arg):.2f}"
+
+
+@register.filter(name="div_100")
+def div_100(value, arg):
+    if not arg:
+        return value * 100.0
+    return value * 100.0 / arg
+
+
+@register.filter(name="div")
+def div(value, arg):
+    if not arg:
+        return value * 1.0
+    return value * 1.0 / arg

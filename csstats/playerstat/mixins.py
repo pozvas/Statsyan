@@ -2,6 +2,7 @@ from typing import Any
 from django.db.models.query import QuerySet
 from steam.mixins import SteamUserBaseMixin
 from demo_database.models import (
+    BuyType,
     Demo,
     Player,
     PlayerInDemo,
@@ -18,38 +19,13 @@ import datetime
 from django.db.models import Sum, Avg, Q, Count, Prefetch, F
 
 
-class PlayerMixin:
+class PlayerMixin(SteamUserBaseMixin):
 
-    def get_queryset(self) -> QuerySet[Any]:
-        self.maps = Map.objects.all()
-        self.math_types = MatchType.objects.all()
-        return None
-
-    def get_object(self, queryset=None) -> QuerySet[Any]:
-        self.maps = Map.objects.all()
-        self.math_types = MatchType.objects.all()
-        return None
-
-    def post(self, request, *args, **kwargs):
-        player = get_object_or_404(Player, pk=self.kwargs["player_id"])
-        form = PlayerCodeForm(request.POST, instance=player)
-        form.save()
-        return HttpResponse(request.path)
-
-    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
-        contex = super().get_context_data(**kwargs)
-        contex["form"] = PlayerCodeForm()
-        contex["maps"] = self.maps
-        contex["math_types"] = self.math_types
-        return contex
-
-
-class PlayerListMixin(SteamUserBaseMixin, PlayerMixin):
-
-    def get_queryset(self) -> QuerySet[Any]:
-        super().get_queryset()
-
+    def get_demos(self) -> QuerySet[Any]:
         self.sides = Side.objects.all()
+        self.maps = Map.objects.all()
+        self.math_types = MatchType.objects.all()
+        self.buy_types = BuyType.objects.all()
 
         start_date_filter = self.request.GET.get("start_date")
         end_date_filter = self.request.GET.get("end_date")
@@ -115,8 +91,18 @@ class PlayerListMixin(SteamUserBaseMixin, PlayerMixin):
             .values("id")
         )
 
+    def get_object(self, queryset=None) -> QuerySet[Any]:
+        return self.get_demos()
+
+    def get_queryset(self) -> QuerySet[Any]:
+        return self.get_demos()
+
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
-        contex = super().get_context_data(**kwargs)
-        contex["player"] = self.player
-        contex["sides"] = self.sides
-        return contex
+        context = super().get_context_data(**kwargs)
+        context["form"] = PlayerCodeForm()
+        context["maps"] = self.maps
+        context["math_types"] = self.math_types
+        context["player"] = self.player
+        context["sides"] = self.sides
+        context["buy_types"] = self.buy_types
+        return context

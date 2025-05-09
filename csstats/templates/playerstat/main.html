@@ -41,6 +41,11 @@
             Оружия
           </a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.resolver_match.url_name == 'graphs' %}active{% endif %}" href="{% url 'playerstat:graphs' player.pk %}">
+            Графики
+          </a>
+        </li>
       </ul>
     </div>
   </nav>

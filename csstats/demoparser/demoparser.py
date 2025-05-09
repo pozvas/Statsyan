@@ -180,11 +180,6 @@ def get_buy_type_by_rounds(parser: DemoParser) -> pd.DataFrame:
     return group_df
 
 
-parser = DemoParser(
-    r"C:\Projects\Python\diplom\csstats_backend\csstats\files\allweapon.dem"
-)
-
-
 def get_rounds_count(parser: DemoParser) -> pd.DataFrame:
     round_start_ticks = parser.parse_event("round_poststart").drop_duplicates()
     round_start = parser.parse_ticks(
@@ -472,33 +467,35 @@ def get_kd(parser: DemoParser) -> pd.DataFrame:
             on=["total_rounds_played", "team_name"],
             how="left",
         )
-        data_sides = (
-            df.groupby(
-                [
-                    "steamid",
-                    "team_name",
-                    "equip_value_name",
-                    "equip_value_name_enemy",
-                ]
-            )
-            .size()
-            .reset_index(name=column_name)
-        )
-
         if column_name == "kills":
-            headshots = df[df["headshot"]]
-            hs_sides = (
-                headshots.groupby(
+            data_sides = (
+                df.groupby(
                     [
                         "steamid",
                         "team_name",
+                        "equip_value_name",
+                        "equip_value_name_enemy",
+                    ]
+                )
+                .agg(
+                    total_rows=("headshot", "size"),
+                    headshots=("headshot", "sum"),
+                )
+                .reset_index()
+                .rename(columns={"total_rows": column_name})
+            )
+        else:
+            data_sides = (
+                df.groupby(
+                    [
+                        "steamid",
+                        "team_name",
+                        "equip_value_name",
+                        "equip_value_name_enemy",
                     ]
                 )
                 .size()
-                .reset_index(name="headshots")
-            )
-            data_sides = data_sides.merge(
-                hs_sides, on=["steamid", "team_name"], how="left"
+                .reset_index(name=column_name)
             )
 
         if result is None:

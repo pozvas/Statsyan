@@ -55,7 +55,11 @@ def update_players_info(steamids=None):
             player.save()
 
 
-def save_demo(path: str, match_time: datetime | None = None):
+def save_demo(
+    path: str,
+    match_time: datetime | None = None,
+    steam_sharecode: str | None = None,
+):
     parser = DemoParser(path)
     info = get_start_info(parser)
 
@@ -98,6 +102,7 @@ def save_demo(path: str, match_time: datetime | None = None):
         with transaction.atomic():
             demo = Demo.objects.create(
                 hash=hash,
+                sharecode=steam_sharecode,
                 win_team=(
                     None
                     if is_tie
@@ -176,6 +181,7 @@ def save_demo(path: str, match_time: datetime | None = None):
                         enemy_buy_type=buy_type_enemy,
                         rounds=row2["rounds"],
                         kills=row2["kills"],
+                        headshots=row2["headshots"],
                         assists=row2["assists"],
                         deaths=row2["deaths"],
                         damage=row2["damage"],

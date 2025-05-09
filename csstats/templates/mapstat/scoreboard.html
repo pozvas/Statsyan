@@ -97,7 +97,7 @@
                                 </tr>
                                 <tr>
                                     <th style="min-width: 300px;" class="text-center">{{ team_name }}</th>
-                                    <th data-toggle="popover" title="Убийства" class="text-center">K</th>
+                                    <th data-toggle="popover" title="Убийства(В голову)" class="text-center">K</th>
                                     <th class="text-center" data-toggle="popover" title="Помощи" >A</th>
                                     <th class="text-center" data-toggle="popover" title="Смерти" >D</th>
                                     <th class="text-center" data-toggle="popover" title="Средний урон за раунд" >ADR</th>
@@ -153,7 +153,7 @@
                                                     {% endif%}
                                                 </div>
                                             </td>
-                                            <td class="text-center">{{ player_in_demo.kills }}</td>
+                                            <td class="text-center">{{ player_in_demo.kills }}({{ player_in_demo.headshots }})</td>
                                             <td class="text-center">{{ player_in_demo.assists }}</td>
                                             <td class="text-center">{{ player_in_demo.deaths }}</td>
                                             <td class="text-center">{{ player_in_demo.adr|floatformat:1 }}</td>

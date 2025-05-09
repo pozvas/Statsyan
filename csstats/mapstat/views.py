@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Any
 from django.db import connection
 from django.db.models.query import QuerySet
@@ -95,6 +96,7 @@ class DemoScoreBoardView(DemoMixin, ListView):
             .annotate(
                 rounds=Sum("scoreboard__rounds"),
                 kills=Sum("scoreboard__kills"),
+                headshots=Sum("scoreboard__headshots"),
                 assists=Sum("scoreboard__assists"),
                 deaths=Sum("scoreboard__deaths"),
                 damage=Sum("scoreboard__damage"),
@@ -449,11 +451,13 @@ def upload_demo(request):
 
         absolute_file_path = default_storage.path(file_path)
         try:
+            mod_time = None
             if file_modification_time:
-                mod_time = float(file_modification_time)
-                os.utime(absolute_file_path, (mod_time, mod_time))
+                mod_time = float(file_modification_time) / 1000
 
-            demo = save_demo(absolute_file_path)
+            demo = save_demo(
+                absolute_file_path, datetime.fromtimestamp(mod_time)
+            )
             return HttpResponseRedirect(
                 reverse("mapstat:demo", kwargs={"demo_id": demo})
             )

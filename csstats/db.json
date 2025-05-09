@@ -188,6 +188,51 @@
         }
     },
     {
+        "model": "demo_database.Map",
+        "pk": 21
+        ,
+        "fields": {
+            "name": "cs_agency",
+            "image": "map/cs_agency.png"
+        }
+    },
+    {
+        "model": "demo_database.Map",
+        "pk": 22
+        ,
+        "fields": {
+            "name": "de_brewery",
+            "image": "map/de_brewery.png"
+        }
+    },
+    {
+        "model": "demo_database.Map",
+        "pk": 23
+        ,
+        "fields": {
+            "name": "de_dogtown",
+            "image": "map/de_dogtown.png"
+        }
+    },
+    {
+        "model": "demo_database.Map",
+        "pk": 24
+        ,
+        "fields": {
+            "name": "de_grail",
+            "image": "map/de_grail.png"
+        }
+    },
+    {
+        "model": "demo_database.Map",
+        "pk": 25
+        ,
+        "fields": {
+            "name": "de_jura",
+            "image": "map/de_jura.png"
+        }
+    },
+    {
         "model": "demo_database.MatchType",
         "pk": 1,
         "fields": {
