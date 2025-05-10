@@ -4,6 +4,7 @@
   Получение кода аунтефикации
 {% endblock %}
 {% block content %}
+<a href="https://help.steampowered.com/en/wizard/HelpWithGameIssue/?appid=730&issueid=128" target="_blank" rel="noopener noreferrer">Получить код аунтефикации и код последнего сыгранного матча можно тут</a>
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     <div class="form-group">
@@ -11,13 +12,11 @@
         {{ form.auth_code }}
         {{ form.auth_code.errors }}
     </div>
-    {% if steam_player.last_match_steam_sharecode == None %}
-      <div class="form-group">
-          <label for="{{ form.last_match_steam_sharecode.id_for_label }}">Код последнего сыгранного матча</label>
-          {{ form.last_match_steam_sharecode }}
-          {{ form.last_match_steam_sharecode.errors }}
-      </div>
-    {% endif %}
-    <button type="submit">Отправить</button>
+    <div class="form-group">
+      <label for="{{ form.last_match_steam_sharecode.id_for_label }}">Код последнего сыгранного матча</label>
+      {{ form.last_match_steam_sharecode }}
+      {{ form.last_match_steam_sharecode.errors }}
+  </div>
+    <button type="submit" class="btn btn-primary">Отправить</button>
   </form>
 {% endblock %}

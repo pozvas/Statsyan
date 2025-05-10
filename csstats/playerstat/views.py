@@ -1,9 +1,11 @@
 from django.db import connection
 from django.utils import timezone
-import datetime
+from django.contrib import messages
+from datetime import datetime
 from typing import Any
 from django.db.models.query import QuerySet
 from django.shortcuts import render, get_object_or_404, redirect
+from mapstat.forms import DemoUploadForm
 from playerstat.mixins import PlayerMixin, PlayerMixin
 from mapstat.mixins import DemoMixin
 from demo_database.models import (
@@ -32,7 +34,7 @@ from django.db.models import (
 )
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 from django.views.generic import ListView, DetailView, View, UpdateView
 from demo_database.savedb import save_demo
@@ -538,3 +540,85 @@ class PlayerGraphsView(PlayerMixin, ListView):
         context["kast"] = json.dumps(kast)
         context["kdr"] = json.dumps(kdr)
         return context
+
+
+class DemoUploadView(PlayerMixin, ListView, LoginRequiredMixin):
+    template_name = "playerstat/uploaddemo.html"
+    context_object_name = "demos"
+    paginate_by = 10
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect("social:begin", "steam")
+
+        if self.request.user.is_superuser:
+            return redirect("csstats:home")
+
+        if (
+            str(self.kwargs["player_id"])
+            != UserSocialAuth.objects.get(user=self.request.user).uid
+        ):
+            return redirect("playerstat:stats", self.kwargs["player_id"])
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self) -> QuerySet[Any]:
+        super().get_queryset()
+
+        start_date_filter = self.request.GET.get("start_date")
+        end_date_filter = self.request.GET.get("end_date")
+        map_filter = self.request.GET.get("map")
+        mode_filter = self.request.GET.get("mode")
+
+        filters = Q()
+
+        if start_date_filter:
+            start_date_filter = timezone.datetime.strptime(
+                start_date_filter, "%Y-%m-%d"
+            ).date()
+            filters = filters & Q(data_played__gte=start_date_filter)
+
+        if end_date_filter:
+            end_date_filter = timezone.datetime.strptime(
+                end_date_filter, "%Y-%m-%d"
+            ).date()
+            end_date_filter = timezone.make_aware(
+                datetime.datetime.combine(end_date_filter, datetime.time.max)
+            )
+            filters = filters & Q(data_played__lte=end_date_filter)
+
+        if map_filter:
+            filters = filters & Q(map=map_filter)
+
+        if mode_filter:
+            filters = filters & Q(match_type=mode_filter)
+
+        return self.request.user.uploads.filter(filters)
+
+    def post(self, request, *args, **kwargs):
+        self.object_list = self.get_queryset()
+        uploaded_file = request.FILES["file"]
+        file_path = default_storage.save(
+            uploaded_file.name, ContentFile(uploaded_file.read())
+        )
+        file_mtime = request.POST.get("file_mtime")
+
+        absolute_file_path = default_storage.path(file_path)
+
+        try:
+            absolute_file_path = default_storage.path(file_path)
+            mod_time = None
+            if file_mtime:
+                mod_time = datetime.fromtimestamp(float(file_mtime) / 1000)
+
+            demo = save_demo(
+                absolute_file_path, mod_time, by_user=request.user
+            )
+            return HttpResponseRedirect(
+                reverse("mapstat:demo", kwargs={"demo_id": demo})
+            )
+        except Exception as e:
+            context = self.get_context_data()
+            context["error"] = f"Ошибка при обработке демо-файла: {str(e)}"
+            return self.render_to_response(context)
+        finally:
+            default_storage.delete(file_path)

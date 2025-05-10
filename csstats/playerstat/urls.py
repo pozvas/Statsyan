@@ -25,4 +25,9 @@ urlpatterns = [
         views.PlayerGraphsView.as_view(),
         name="graphs",
     ),
+    path(
+        "<int:player_id>/upload/",
+        views.DemoUploadView.as_view(),
+        name="upload",
+    ),
 ]

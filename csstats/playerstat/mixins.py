@@ -36,32 +36,37 @@ class PlayerMixin(SteamUserBaseMixin):
 
         filters = Q()
 
-        if start_date_filter:
-            start_date_filter = timezone.datetime.strptime(
-                start_date_filter, "%Y-%m-%d"
-            ).date()
-            filters = filters & Q(data_played__gte=start_date_filter)
+        try:
+            if start_date_filter:
+                start_date_filter = timezone.datetime.strptime(
+                    start_date_filter, "%Y-%m-%d"
+                ).date()
+                filters = filters & Q(data_played__gte=start_date_filter)
 
-        if end_date_filter:
-            end_date_filter = timezone.datetime.strptime(
-                end_date_filter, "%Y-%m-%d"
-            ).date()
-            end_date_filter = timezone.make_aware(
-                datetime.datetime.combine(end_date_filter, datetime.time.max)
-            )
-            filters = filters & Q(data_played__lte=end_date_filter)
+            if end_date_filter:
+                end_date_filter = timezone.datetime.strptime(
+                    end_date_filter, "%Y-%m-%d"
+                ).date()
+                end_date_filter = timezone.make_aware(
+                    datetime.datetime.combine(
+                        end_date_filter, datetime.time.max
+                    )
+                )
+                filters = filters & Q(data_played__lte=end_date_filter)
 
-        if map_filter:
-            filters = filters & Q(map=map_filter)
+            if map_filter:
+                filters = filters & Q(map=map_filter)
 
-        if mode_filter:
-            filters = filters & Q(match_type=mode_filter)
+            if mode_filter:
+                filters = filters & Q(match_type=mode_filter)
 
-        if min_rating_filter:
-            filters = filters & Q(rating__gte=float(min_rating_filter))
+            if min_rating_filter:
+                filters = filters & Q(rating__gte=float(min_rating_filter))
 
-        if max_rating_filter:
-            filters = filters & Q(rating__lte=float(max_rating_filter))
+            if max_rating_filter:
+                filters = filters & Q(rating__lte=float(max_rating_filter))
+        except Exception:
+            pass
 
         self.player = get_object_or_404(Player, pk=self.kwargs["player_id"])
         return (

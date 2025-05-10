@@ -36,7 +36,9 @@ from steam.steamapi import get_players_names_and_avatars
 from datetime import datetime
 from django.utils import timezone
 import threading
+from django.contrib.auth import get_user_model
 
+User = get_user_model()
 write_lock = threading.Lock()
 
 
@@ -52,6 +54,7 @@ def update_players_info(steamids=None):
             player = Player.objects.get(pk=player_data["steamid"])
             player.last_avatar = player_data["avatar"]
             player.last_nickname = player_data["personaname"]
+            player.last_avatar_big = player_data["avatarfull"]
             player.save()
 
 
@@ -59,6 +62,7 @@ def save_demo(
     path: str,
     match_time: datetime | None = None,
     steam_sharecode: str | None = None,
+    by_user: User | None = None,
 ):
     parser = DemoParser(path)
     info = get_start_info(parser)
@@ -118,6 +122,8 @@ def save_demo(
                 match_type=match_type,
                 data_played=match_time,
             )
+            if by_user:
+                demo.uploaded_by.add(by_user)
 
             for _, row in info.iterrows():
                 player, created = Player.objects.get_or_create(

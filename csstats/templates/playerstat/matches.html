@@ -7,7 +7,9 @@
             <thead class="table-dark">
                 <tr>
                     <th scope="col">Дата</th>
+                    <th scope="col">Режим</th>
                     <th scope="col">Карта</th>
+                    <th scope="col">Счет</th>
                     <th scope="col">K</th>
                     <th scope="col">A</th>
                     <th scope="col">D</th>
@@ -28,9 +30,15 @@
                 {% for player_in_demo in player_demos %}
                     <tr>
                         <td class="text">{{ player_in_demo.demo.data_played }}</td>
+                        <td class="text">{{ player_in_demo.demo.match_type.name }}</td>
                         <td>
                             <img src="{% static player_in_demo.demo.map.image %}" alt="Иконка {{ player_in_demo.demo.map.name }}" class="avatar" style="width: 48px; height: 48px;"/>
                             {{ player_in_demo.demo.map.name }}
+                        </td>
+                        <td class="{% if player_in_demo.demo.win_team == player_in_demo.team %} text-success {% else %} text-danger {% endif %}">
+                            {% if player_in_demo.demo.win_team == player_in_demo.team %} {{ player_in_demo.demo.score_win }} {% else %} {{ player_in_demo.demo.score_lose }} {% endif %}
+                            :
+                            {% if player_in_demo.demo.win_team == player_in_demo.team %} {{ player_in_demo.demo.score_lose }} {% else %} {{ player_in_demo.demo.score_win }} {% endif %}
                         </td>
                         <td class="fw-bold">{{ player_in_demo.kills }}</td>
                         <td>{{ player_in_demo.assists }}</td>

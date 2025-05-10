@@ -1,10 +1,29 @@
 from typing import Any
+
+from django.shortcuts import redirect
 from demo_database.models import Player
 from social_django.models import UserSocialAuth
 from demo_database.savedb import update_players_info
+from django.db.models import Q
+from django.db.models.query import QuerySet
 
 
 class SteamUserBaseMixin:
+
+    def get(self, request, *args, **kwargs):
+        query = self.request.GET.get("search")
+        if query:
+            try:
+                id = int(query)
+            except Exception:
+                id = None
+            result = Player.objects.filter(
+                Q(pk=id) | Q(last_nickname__startswith=query)
+            ).first()
+
+            if result is not None:
+                return redirect("playerstat:stats", result.pk)
+        return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         contex = super().get_context_data(**kwargs)

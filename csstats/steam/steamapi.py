@@ -22,6 +22,7 @@ def get_players_names_and_avatars(stemaids):
                     "personaname": player["personaname"],
                     "avatar": player["avatar"],
                     "steamid": player["steamid"],
+                    "avatarfull": player["avatarfull"],
                 }
                 for player in players
             ]

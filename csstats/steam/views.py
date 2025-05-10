@@ -6,9 +6,9 @@ from .mixins import SteamUserBaseMixin
 
 
 class Main(SteamUserBaseMixin, TemplateView):
-    template_name = 'base.html'
+    template_name = "base.html"
 
 
 def logout_view(request):
     logout(request)
-    return redirect('home')
+    return redirect("home")

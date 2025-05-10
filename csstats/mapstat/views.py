@@ -4,6 +4,8 @@ from django.db import connection
 from django.db.models.query import QuerySet
 from django.shortcuts import render, get_object_or_404
 import os
+
+from django.views import View
 from mapstat.mixins import DemoMixin
 from demo_database.models import (
     Demo,
@@ -439,32 +441,3 @@ class DemoWeaponView(DemoMixin, ListView):
         contex = super().get_context_data(**kwargs)
         contex["weapon_types"] = self.weapon_types
         return contex
-
-
-def upload_demo(request):
-    if request.method == "POST" and request.FILES["file"]:
-        uploaded_file = request.FILES["file"]
-        file_path = default_storage.save(
-            uploaded_file.name, ContentFile(uploaded_file.read())
-        )
-        file_modification_time = request.POST.get("file_mtime")
-
-        absolute_file_path = default_storage.path(file_path)
-        try:
-            mod_time = None
-            if file_modification_time:
-                mod_time = float(file_modification_time) / 1000
-
-            demo = save_demo(
-                absolute_file_path, datetime.fromtimestamp(mod_time)
-            )
-            return HttpResponseRedirect(
-                reverse("mapstat:demo", kwargs={"demo_id": demo})
-            )
-        except Exception:
-            traceback.print_exc()
-            return HttpResponseRedirect(reverse("mapstat:upload"))
-        finally:
-            default_storage.delete(file_path)
-
-    return render(request, "uploaddemo/uploaddemo.html")

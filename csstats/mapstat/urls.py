@@ -12,5 +12,4 @@ urlpatterns = [
     path(
         "<int:demo_id>/weapons", views.DemoWeaponView.as_view(), name="weapons"
     ),
-    path("upload/", views.upload_demo, name="upload"),
 ]

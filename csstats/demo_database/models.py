@@ -58,7 +58,7 @@ class Demo(models.Model):
     score_lose = models.SmallIntegerField()
     map = models.ForeignKey(Map, on_delete=models.DO_NOTHING)
     match_type = models.ForeignKey(MatchType, on_delete=models.DO_NOTHING)
-    uploaded_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    uploaded_by = models.ManyToManyField(User, related_name="uploads")
 
 
 class Round(models.Model):

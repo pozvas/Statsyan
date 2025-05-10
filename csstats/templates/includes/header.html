@@ -1,22 +1,38 @@
 {% load static %}
 <header>
   <nav class="navbar navbar-light" style="background-color: lightskyblue">
-    <div class="container">
-      Заголовок
-    </div>
-    <div>
-      {% if user.is_superuser %}
-        <a class="text-reset text-decoration-none">Вошли как суперпользователь</a>
-        <a href="{% url 'logout' %}">Выйти</a>
-      {% elif user.is_authenticated %}
+    <div class="container-fluid">
+      <div class="d-flex">
+        <a class="navbar-brand mb-0 h1" href="/">Statsyan</a>
+      </div>
+      
+      <form method="get" action="" class="d-flex mx-auto" style="width: 40%;">
+        <div class="input-group">
+          <input type="text" 
+                 name="search" 
+                 class="form-control" 
+                 placeholder="Введите никнейм игрока или его steamid" 
+                 value="{{ request.GET.search }}">
+          <button class="btn btn-primary" type="submit">
+            <i class="bi bi-search"></i> Поиск
+          </button>
+        </div>
+      </form>
+      
+      <div class="d-flex align-items-center">
+        {% if user.is_superuser %}
+          <span class="me-2">Вошли как суперпользователь</span>
+          <a href="{% url 'logout' %}" class="btn btn-outline-danger btn-sm">Выйти</a>
+        {% elif user.is_authenticated %}
           {% if steam_player.last_avatar %}
-              <img src="{{ steam_player.last_avatar }}" alt="Аватар {{ steam_player.last_nickname }}" class="avatar">
+            <img src="{{ steam_player.last_avatar }}" alt="Аватар {{ steam_player.last_nickname }}" class="rounded-circle me-2" style="width: 32px; height: 32px;">
           {% endif %}
-          <a href="{% url 'playerstat:stats' steam_player.pk %}" class="text-reset text-decoration-none">{{ steam_player.last_nickname }}</a>
-          <a href="{% url 'logout' %}">Выйти</a>
-      {% else %}
-          <a href="{% url 'social:begin' 'steam' %}">Войти через Steam</a>
-      {% endif %}
+          <a href="{% url 'playerstat:stats' steam_player.pk %}" class="text-reset text-decoration-none me-2">{{ steam_player.last_nickname }}</a>
+          <a href="{% url 'logout' %}" class="btn btn-outline-danger btn-sm">Выйти</a>
+        {% else %}
+          <a href="{% url 'social:begin' 'steam' %}" class="btn btn-primary btn-sm">Войти через Steam</a>
+        {% endif %}
+      </div>
     </div>
   </nav>
 </header>

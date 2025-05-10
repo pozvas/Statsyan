@@ -93,7 +93,7 @@ def process_demo(sharecode):
 
         print(f"Файл распакован в {extracted_path}")
 
-        save_demo(extracted_path, demo_time)
+        save_demo(extracted_path, demo_time, sharecode)
 
     except requests.exceptions.RequestException as e:
         print(f"Ошибка при скачивании файла: {e}")
