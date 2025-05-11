@@ -80,6 +80,8 @@ def save_demo(
 
     if demo is not None:
         del parser
+        if by_user:
+            demo.uploaded_by.add(by_user)
         return demo.pk
 
     # try:

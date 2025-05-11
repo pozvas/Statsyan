@@ -30,6 +30,10 @@
                                 </button>
                             </div>
                         </form>
+                        {% if error %}
+                        <div class="text-danger" id="error">Ошибка обработки файла, попробуйте другой</div>
+                        {% endif %}
+                        <div class="text-succsess" style="display: none" id="succsess">Файл принят в обработку. Обработка может занять некоторое время.</div>
                     </div>
                 </div>
             </div>
@@ -121,19 +125,19 @@
   <script>
     document.getElementById('demoFileInput').addEventListener('change', function(e) {
         const fileInput = e.target;
-        const fileError = document.getElementById('fileError');
         const mtimeInput = document.getElementById('fileMtime');
-        
+        const error = document.getElementById('error');
+        if (error){
+            error.style.display = 'none';
+        }
         const fileName = fileInput.value.toLowerCase();
         if (!fileName.endsWith('.dem')) {
-            fileError.style.display = 'block';
             fileInput.value = '';
-        } else {
-            fileError.style.display = 'none';
-            
+        } else {     
             if (fileInput.files.length > 0) {
                 const file = fileInput.files[0];
                 mtimeInput.value = file.lastModified;
+                console.log(file.lastModified)
             }
         }
     });
@@ -142,7 +146,9 @@
         const fileInput = document.getElementById('demoFileInput');
         if (!fileInput.value.toLowerCase().endsWith('.dem')) {
             e.preventDefault();
-            document.getElementById('fileError').style.display = 'block';
+        }
+        else {
+            document.getElementById('succsess').style.display = 'blocked';
         }
     });
   </script>

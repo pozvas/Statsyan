@@ -7,8 +7,22 @@
 <div class="d-flex flex-column align-items-center">
     <div id="accordion" style="width: 100%; max-width: 800px;">
         {% for round in rounds %}
-        {% if round.max_players == 5 and round.round_number == 13 or round.max_players == 2 and round.round_number == 9 %}
-            <p class="text-center my-2 w-100">Смена сторон</p>
+        {% if round.max_players == 5 %}
+            {% with ots=round.round_number|subtract:24%}
+                {% if round.round_number == 13 or round.round_number > 27 and ots|mod:6 == 4 %}
+                    <p class="text-center my-2 w-100">Смена сторон</p>
+                {% elif  round.round_number > 24 and ots|mod:6 == 1 %}
+                    <p class="text-center my-2 w-100">Дополнительные раунды {{ots|div_int:6|add:1}}</p>
+                {% endif %}
+            {% endwith %}
+        {% elif round.max_players == 3 %}
+            {% with ots=round.round_number|subtract:16%}
+                {% if round.round_number == 9 or round.round_number > 19 and ots|mod:6 == 4 %}
+                    <p class="text-center my-2 w-100">Смена сторон</p>
+                {% elif  round.round_number > 16 and ots|mod:6 == 1 %}
+                    <p class="text-center my-2 w-100">Дополнительные раунды {{ots|div_int:6|add:1}}</p>
+                {% endif %}
+            {% endwith %}
         {% endif %}
         <div class="card mb-3 w-100">
             <div class="card-header p-0 w-100">

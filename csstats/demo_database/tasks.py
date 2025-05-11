@@ -7,20 +7,15 @@ from demo_database.models import Player, PlayerInDemo, Demo
 from django.core.files.storage import default_storage
 from demo_database.savedb import save_demo
 from django.db.models import Q
-from csstats.settings import REDIS_CLIENT
 from django.db import connection
 from decouple import config
 import itertools
 import bz2
 from csstats.settings import ZIP_STTORAGE, UNZIP_STTORAGE
+import shutil
 
 
 BOT_PORT = config("BOT_PORT")
-
-
-def sql_func(sql):
-    with connection.cursor() as cursor:
-        cursor.execute(sql)
 
 
 def debug_func():
@@ -28,6 +23,43 @@ def debug_func():
         cursor.execute(
             "UPDATE demo_database_player SET last_match_steam_sharecode = 'CSGO-GNKXq-cKp5a-HedPq-n7uaX-85syM' WHERE steamid = 76561198305227842"
         )
+
+
+def uzip():
+    folder = "files/demos/zip"
+    folder_to = "files/demos/unzip"
+
+    # Создаем папку для распакованных файлов, если её нет
+    os.makedirs(folder_to, exist_ok=True)
+
+    # Перебираем все файлы в исходной папке
+    for filename in os.listdir(folder):
+        if filename.endswith(".bz2"):
+            # Полный путь к архиву
+            bz2_path = os.path.join(folder, filename)
+            # Имя файла без расширения .bz2
+            output_filename = os.path.splitext(filename)[0]
+            # Полный путь к распакованному файлу
+            output_path = os.path.join(folder_to, output_filename)
+
+            # Распаковываем архив
+            with bz2.BZ2File(bz2_path, "rb") as f_in:
+                with open(output_path, "wb") as f_out:
+                    shutil.copyfileobj(f_in, f_out)
+
+            print(f"{filename} раскпакован")
+
+    print("Распаковка завершена!")
+
+
+def save():
+    folder = "files/demos/unzip"
+    for filename in os.listdir(folder):
+        path = os.path.join(folder, filename)
+        try:
+            save_demo(path)
+        except Exception as e:
+            print(f"Ошибка {e} в {filename}")
 
 
 def get_new_sharecodes(player_id):

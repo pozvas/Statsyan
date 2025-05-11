@@ -157,7 +157,7 @@
                 <!-- Общий процент побед в клатчах -->
                 <div class="text-center mb-4">
                     {% with wr_clutches=player_stat.win_clutches_total|div_100:player_stat.clutches_total %}
-                        <div style="--percentage: {{ wr_clutches }}%" class="progress-circle">
+                        <div style="--percentage: {{ wr_clutches|replace_comma_to_dot }}%" class="progress-circle">
                             {{ wr_clutches|floatformat:1 }}%
                         </div>
                     {% endwith %}
@@ -177,12 +177,11 @@
                             </div>
                             <div class="progress clutch-progress">
                                     <div class="progress-bar bg-success" role="progressbar" 
-                                        style="width: {{ wr_clutches_1x1 }}%" 
-                                        aria-valuenow="{{ wr_clutches_1x1 }}" 
+                                        style="width: {{ wr_clutches_1x1|replace_comma_to_dot }}%" 
+                                        aria-valuenow="{{ wr_clutches_1x1|replace_comma_to_dot }}" 
                                         aria-valuemin="0" 
                                         aria-valuemax="100">
                                     </div>
-                                
                             </div>
                         {% endwith %}
                     </div>
@@ -198,8 +197,8 @@
                             </div>
                             <div class="progress clutch-progress">
                                     <div class="progress-bar bg-success" role="progressbar" 
-                                        style="width: {{ wr_clutches_1x2 }}%" 
-                                        aria-valuenow="{{ wr_clutches_1x2 }}" 
+                                        style="width: {{ wr_clutches_1x2|replace_comma_to_dot }}%" 
+                                        aria-valuenow="{{ wr_clutches_1x2|replace_comma_to_dot }}" 
                                         aria-valuemin="0" 
                                         aria-valuemax="100">
                                     </div>
@@ -218,8 +217,8 @@
                             </div>
                             <div class="progress clutch-progress">
                                     <div class="progress-bar bg-success" role="progressbar" 
-                                        style="width: {{ wr_clutches_1x3 }}%" 
-                                        aria-valuenow="{{ wr_clutches_1x3 }}" 
+                                        style="width: {{ wr_clutches_1x3|replace_comma_to_dot }}%" 
+                                        aria-valuenow="{{ wr_clutches_1x3|replace_comma_to_dot }}" 
                                         aria-valuemin="0" 
                                         aria-valuemax="100">
                                     </div>
@@ -238,8 +237,8 @@
                             </div>
                             <div class="progress clutch-progress">
                                     <div class="progress-bar bg-success" role="progressbar" 
-                                        style="width: {{ wr_clutches_1x4 }}%" 
-                                        aria-valuenow="{{ wr_clutches_1x4 }}" 
+                                        style="width: {{ wr_clutches_1x4|replace_comma_to_dot }}%" 
+                                        aria-valuenow="{{ wr_clutches_1x4|replace_comma_to_dot }}" 
                                         aria-valuemin="0" 
                                         aria-valuemax="100">
                                     </div>
@@ -258,8 +257,8 @@
                             </div>
                             <div class="progress clutch-progress">
                                     <div class="progress-bar bg-success" role="progressbar" 
-                                        style="width: {{ wr_clutches_1x5 }}%" 
-                                        aria-valuenow="{{ wr_clutches_1x5 }}" 
+                                        style="width: {{ wr_clutches_1x5|replace_comma_to_dot }}%" 
+                                        aria-valuenow="{{ wr_clutches_1x5|replace_comma_to_dot }}" 
                                         aria-valuemin="0" 
                                         aria-valuemax="100">
                                     </div>
@@ -364,7 +363,7 @@
                 
                 <div class="text-center mb-4">
                     {% with first_kills_rate=player_stat.first_kills_total|div_100:player_stat.first_attempts_total %}
-                        <div style="--percentage: {{ first_kills_rate|floatformat:1 }}%" 
+                        <div style="--percentage: {{ first_kills_rate|floatformat:1|replace_comma_to_dot }}%" 
                             class="progress-circle progress-circle-small">
                             {{ first_kills_rate|floatformat:1 }}%
                         </div>
@@ -374,7 +373,7 @@
                 
                 <div class="text-center">
                     {% with first_attempts_rate=player_stat.first_attempts_total|div_100:player_stat.rounds_total %}
-                        <div style="--percentage: {{ first_attempts_rate|floatformat:1 }}%" 
+                        <div style="--percentage: {{ first_attempts_rate|floatformat:1|replace_comma_to_dot }}%" 
                             class="progress-circle progress-circle-small">
                             {{ first_attempts_rate|floatformat:1 }}%
                         </div>

@@ -3,6 +3,7 @@
 from awpy import Demo, stats
 import pandas as pd
 from demoparser2 import DemoParser
+
 import json
 
 
@@ -38,6 +39,43 @@ BUYTYPE = [
         "equipment_value_from": 4001,
         "equipment_value_to": 160000,
         "is_pistol": 0,
+    },
+]
+
+
+WINREASON = [
+    {
+        "name": 1,
+        "win_side": "T",
+    },
+    {
+        "name": 7,
+        "win_side": "CT",
+    },
+    {
+        "name": 8,
+        "win_side": "CT",
+    },
+    {
+        "name": 9,
+        "win_side": "T",
+    },
+    {
+        "name": 10,
+        "win_side": "CT",
+    },
+    {
+        "name": 12,
+        "win_side": "CT",
+    },
+    {"name": "HostagesNotRescued", "win_side": "T"},
+    {
+        "name": "TerroristsSurrender",
+        "win_side": "CT",
+    },
+    {
+        "name": "CTSurrender",
+        "win_side": "T",
     },
 ]
 
@@ -575,12 +613,36 @@ def get_full_clutches_info(
     parser: DemoParser, is_win: bool = True
 ) -> pd.DataFrame:
     deaths = parser.parse_event("player_death", other=["total_rounds_played"])
-    round_ends = parser.parse_event("round_end")
+
+    round_end = parser.parse_event("round_officially_ended").drop_duplicates()
+    round_end["tick"] = round_end["tick"] - 1
+    ticks_end = pd.concat(
+        [round_end, parser.parse_event("cs_win_panel_match")]
+    )
+    round_ends = (
+        parser.parse_ticks(
+            ["round_win_reason", "total_rounds_played"],
+            ticks=ticks_end["tick"],
+        )[["round_win_reason", "total_rounds_played"]]
+        .drop_duplicates()
+        .reset_index(drop=True)
+    )
+
+    def determine_winner(row):
+        win_reason = row["round_win_reason"]
+        for reason in WINREASON:
+            if reason["name"] == win_reason:
+                return reason["win_side"]
+        return None
+
+    round_ends["winner"] = round_ends.apply(determine_winner, axis=1)
+    print(round_ends)
+
     df = parser.parse_ticks(
         ["is_alive", "team_name", "team_rounds_total"],
         ticks=deaths["tick"].to_list(),
     )
-    max_round = deaths["total_rounds_played"].max() + 1
+    max_round = round_ends["total_rounds_played"].max()
     result = pd.DataFrame(
         columns=["steamid", "total_rounds_played", "against", "team_name"]
     )
@@ -1289,7 +1351,7 @@ def get_kills_in_round(parser: DemoParser) -> pd.DataFrame:
 
         return row["round"]
 
-    deaths["total_rounds_played"] = deaths.apply(
+    deaths["round"] = deaths.apply(
         lambda row: kills_after_round(row, round_end), axis=1
     )
     ticks = parser.parse_ticks(["team_name"], ticks=deaths["tick"].to_list())

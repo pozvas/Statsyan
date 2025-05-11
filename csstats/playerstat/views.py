@@ -10,6 +10,8 @@ from playerstat.mixins import PlayerMixin, PlayerMixin
 from mapstat.mixins import DemoMixin
 from demo_database.models import (
     Demo,
+    Map,
+    MatchType,
     PlayerInDemo,
     ScoreBoard,
     Side,
@@ -362,29 +364,6 @@ class PlayerWeaponView(PlayerMixin, ListView):
         if weapon_type_filter:
             filters = filters & Q(weapon_type=weapon_type_filter)
 
-        # изменить когда перейду на постре и для карт
-        # SELECT
-        #     w.id,
-        #     w.name,
-        #     w.caption,
-        #     w.weapon_type_id,
-        #     w.image,
-        #     SUM(pws.fires_count) AS fires,
-        #     phs.damage,
-        #     phs.kills,
-        #     phs.hits,
-        #     SUM(CASE WHEN hg.name = 'head' THEN phs.hits ELSE 0 END) AS headshots
-        # FROM demo_database_weapon w
-        # JOIN demo_database_playerweaponstat pws ON w.id = pws.weapon_id
-        # JOIN LATERAL (
-        #     SELECT
-        #     SUM(phs1.damage) AS damage,
-        #     SUM(phs1.kills) AS kills,
-        #     SUM(phs1.hits) AS hits
-        #     FROM demo_database_playerhitgroupstat phs1
-        #     WHERE pws.id = phs1.player_weapon_stat_id
-        # ) phs ON TRUE
-
         query = f"""
         SELECT
             w.id,
@@ -392,18 +371,26 @@ class PlayerWeaponView(PlayerMixin, ListView):
             w.caption,
             w.weapon_type_id,
             w.image,
-            SUM(DISTINCT pws.fires_count) AS fires,
-            SUM(phs.damage) AS damage,
-            SUM(phs.kills) AS kills,
-            SUM(phs.hits) AS hits,
-            SUM(CASE WHEN hg.name = 'head' THEN phs.hits ELSE 0 END) AS headshots
+            SUM(COALESCE(pws.fires_count, 0)) AS fires,
+            SUM(COALESCE(phs.damage, 0)) damage,
+            SUM(COALESCE(phs.kills, 0)) kills,
+            SUM(COALESCE(phs.hits, 0)) hits,
+            SUM(COALESCE(phs.headshots, 0)) headshots
         FROM demo_database_weapon w
         JOIN demo_database_playerweaponstat pws ON w.id = pws.weapon_id
-        JOIN demo_database_playerhitgroupstat phs ON pws.id = phs.player_weapon_stat_id
+        JOIN LATERAL (
+            SELECT
+            SUM(phs1.damage) AS damage,
+            SUM(phs1.kills) AS kills,
+            SUM(phs1.hits) AS hits,
+            SUM(CASE WHEN hg.name = 'head' THEN phs1.hits ELSE 0 END) AS headshots
+            FROM demo_database_playerhitgroupstat phs1
+            LEFT JOIN demo_database_hitgroup hg ON phs1.hit_group_id = hg.id
+            WHERE pws.id = phs1.player_weapon_stat_id
+        ) phs ON TRUE
         LEFT JOIN demo_database_playerindemo pid ON pid.demo_id = pws.demo_id AND pid.player_id = pws.player_id
-        LEFT JOIN demo_database_hitgroup hg ON phs.hit_group_id = hg.id
         WHERE pws.demo_id in ({",".join(str(demo["id"]) for demo in demos)}) 
-        AND pws.player_id = {self.player.pk}
+        AND pws.player_id = '{self.player.pk}'
         {f"AND pws.side_id = {side_filter}" if side_filter else ""}
         {f"AND w.weapon_type_id = {weapon_type_filter}" if weapon_type_filter else ""}
         GROUP BY w.id, w.name, w.caption, w.weapon_type_id, w.image
@@ -503,7 +490,7 @@ class PlayerGraphsView(PlayerMixin, ListView):
                 "x": map.demo.data_played.strftime("%d-%m %H:%M"),
                 "y": (
                     map.elo_old
-                    if map.elo_old
+                    if map.elo_old is not None
                     else map.rang.code * 1111 if map.rang.code else None
                 ),
             }
@@ -542,10 +529,11 @@ class PlayerGraphsView(PlayerMixin, ListView):
         return context
 
 
-class DemoUploadView(PlayerMixin, ListView, LoginRequiredMixin):
+class DemoUploadView(SteamUserBaseMixin, ListView, LoginRequiredMixin):
     template_name = "playerstat/uploaddemo.html"
     context_object_name = "demos"
     paginate_by = 10
+    model = Demo
 
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
@@ -563,6 +551,12 @@ class DemoUploadView(PlayerMixin, ListView, LoginRequiredMixin):
 
     def get_queryset(self) -> QuerySet[Any]:
         super().get_queryset()
+
+        self.sides = Side.objects.all()
+        self.maps = Map.objects.all()
+        self.math_types = MatchType.objects.all()
+        self.buy_types = BuyType.objects.all()
+        self.player = get_object_or_404(Player, pk=self.kwargs["player_id"])
 
         start_date_filter = self.request.GET.get("start_date")
         end_date_filter = self.request.GET.get("end_date")
@@ -592,7 +586,11 @@ class DemoUploadView(PlayerMixin, ListView, LoginRequiredMixin):
         if mode_filter:
             filters = filters & Q(match_type=mode_filter)
 
-        return self.request.user.uploads.filter(filters)
+        return (
+            self.request.user.uploads.filter(filters)
+            .select_related("match_type", "map")
+            .order_by("-data_played")
+        )
 
     def post(self, request, *args, **kwargs):
         self.object_list = self.get_queryset()
@@ -602,14 +600,11 @@ class DemoUploadView(PlayerMixin, ListView, LoginRequiredMixin):
         )
         file_mtime = request.POST.get("file_mtime")
 
-        absolute_file_path = default_storage.path(file_path)
-
         try:
             absolute_file_path = default_storage.path(file_path)
             mod_time = None
             if file_mtime:
                 mod_time = datetime.fromtimestamp(float(file_mtime) / 1000)
-
             demo = save_demo(
                 absolute_file_path, mod_time, by_user=request.user
             )
@@ -619,6 +614,16 @@ class DemoUploadView(PlayerMixin, ListView, LoginRequiredMixin):
         except Exception as e:
             context = self.get_context_data()
             context["error"] = f"Ошибка при обработке демо-файла: {str(e)}"
+            traceback.print_exc()
             return self.render_to_response(context)
         finally:
             default_storage.delete(file_path)
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context["maps"] = self.maps
+        context["math_types"] = self.math_types
+        context["player"] = self.player
+        context["sides"] = self.sides
+        context["buy_types"] = self.buy_types
+        return context

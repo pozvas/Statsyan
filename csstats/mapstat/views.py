@@ -408,16 +408,24 @@ class DemoWeaponView(DemoMixin, ListView):
             w.caption,
             w.weapon_type_id,
             w.image,
-            SUM(DISTINCT pws.fires_count) AS fires,
-            SUM(phs.damage) AS damage,
-            SUM(phs.kills) AS kills,
-            SUM(phs.hits) AS hits,
-            SUM(CASE WHEN hg.name = 'head' THEN phs.hits ELSE 0 END) AS headshots
+            SUM(COALESCE(pws.fires_count, 0)) AS fires,
+            SUM(COALESCE(phs.damage, 0)) damage,
+            SUM(COALESCE(phs.kills, 0)) kills,
+            SUM(COALESCE(phs.hits, 0)) hits,
+            SUM(COALESCE(phs.headshots, 0)) headshots
         FROM demo_database_weapon w
         JOIN demo_database_playerweaponstat pws ON w.id = pws.weapon_id
-        JOIN demo_database_playerhitgroupstat phs ON pws.id = phs.player_weapon_stat_id
+        JOIN LATERAL (
+            SELECT
+            SUM(phs1.damage) AS damage,
+            SUM(phs1.kills) AS kills,
+            SUM(phs1.hits) AS hits,
+            SUM(CASE WHEN hg.name = 'head' THEN phs1.hits ELSE 0 END) AS headshots
+            FROM demo_database_playerhitgroupstat phs1
+            LEFT JOIN demo_database_hitgroup hg ON phs1.hit_group_id = hg.id
+            WHERE pws.id = phs1.player_weapon_stat_id
+        ) phs ON TRUE
         LEFT JOIN demo_database_playerindemo pid ON pid.demo_id = pws.demo_id AND pid.player_id = pws.player_id
-        LEFT JOIN demo_database_hitgroup hg ON phs.hit_group_id = hg.id
         WHERE pws.demo_id = %s 
         {f"AND pws.side_id = {side_filter}" if side_filter else ""}
         {f"AND w.weapon_type_id = {weapon_type_filter}" if weapon_type_filter else ""}
