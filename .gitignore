@@ -129,6 +129,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+steam_bot/node_modules/
 
 # Spyder project settings
 .spyderproject
