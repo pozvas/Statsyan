@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "cores": "^0.8.5",
+    "csgo": "^1.5.15",
+    "csgo-sharecode": "^3.1.2",
+    "dotenv": "^16.4.7",
+    "express": "^5.1.0",
+    "long": "^5.2.4",
+    "protobufjs": "^7.4.0",
+    "steam-user": "^5.2.0"
+  }
+}
