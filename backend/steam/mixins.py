@@ -6,6 +6,7 @@ from social_django.models import UserSocialAuth
 from demo_database.savedb import update_players_info
 from django.db.models import Q
 from django.db.models.query import QuerySet
+from django.db.models.functions import Lower
 
 
 class SteamUserBaseMixin:
@@ -17,10 +18,15 @@ class SteamUserBaseMixin:
                 id = int(query)
             except Exception:
                 id = None
-            result = Player.objects.filter(
-                Q(pk=id) | Q(last_nickname__startswith=query)
-            ).first()
-
+            result = (
+                Player.objects.annotate(
+                    lower_last_nickname=Lower("last_nickname")
+                )
+                .filter(
+                    Q(pk=id) | Q(lower_last_nickname__startswith=query.lower())
+                )
+                .first()
+            )
             if result is not None:
                 return redirect("playerstat:stats", result.pk)
         return super().get(request, *args, **kwargs)
