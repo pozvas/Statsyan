@@ -140,6 +140,7 @@ class PlayerStatsView(PlayerMixin, DetailView):
                 deaths_total=Sum("demos__scoreboard__deaths"),
                 damage_total=Sum("demos__scoreboard__damage"),
                 rounds_total=Sum("demos__scoreboard__rounds"),
+                kast_rounds_total=Sum("demos__scoreboard__kast_rounds"),
                 first_kills_total=Sum("demos__scoreboard__first_kills"),
                 first_attempts_total=Sum("demos__scoreboard__first_deaths")
                 + Sum("demos__scoreboard__first_kills"),

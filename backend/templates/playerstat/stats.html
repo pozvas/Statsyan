@@ -145,7 +145,15 @@
                     <div class="main-stat {% if player_stat.rating_total < 0.9 %}bad-rating{% elif player_stat.rating_total > 1.1 %}good-rating{% else %}neutral-rating{% endif %}">
                         {{ player_stat.rating_total|floatformat:2 }}
                     </div>
+                    <div class="mt-3">
+                        <div class="stat-value">{{ player_stat.kast_rounds_total|div_100:player_stat.rounds_total|floatformat:2 }} %</div>
+                        <div class="stat-label">KAST</div>
+                        
+                        <div class="stat-value">{{ player_stat.rounds_total }}</div>
+                        <div class="stat-label">Сыграно раундов</div>
+                    </div>
                 </div>
+                
             </div>
         </div>
         

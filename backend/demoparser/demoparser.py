@@ -80,14 +80,14 @@ WINREASON = [
 ]
 
 
-def series_safe_get(self, default=None, idx=0):
+def series_get_or_else(self, default=None, idx=0):
     return self.iat[idx] if not self.empty else default
 
 
-pd.Series.safe_get = series_safe_get
+pd.Series.get_or_else = series_get_or_else
 
 
-def _merge_many(
+def merge_many(
     list: list[pd.DataFrame], how="inner", on=None
 ) -> pd.DataFrame:
     if len(list) == 0:
@@ -104,10 +104,6 @@ def get_max_tick(parser: DemoParser):
     return parser.parse_event("cs_win_panel_match")["tick"][0]
 
 
-# УЗНАЧТЬ ЧТО БУДЕТ ЕСЛИ ЧЕЛ ЛИВНЕТ ПРИ СМЕНЕ СТОРОН (можно в напарниках)
-# ЧО КАК С НАБЛЮДАТЕЛЯМИ (ХЗ ЕСТЬ ЛИ ОНИ НО НУЖНО ПОНЯТЬ)
-# удалить все команды кроме 2(Т) и 3(СТ)
-# есть баг с килами после конца раунда (11 раунд демки с id 12)
 def get_start_info(parser: DemoParser) -> pd.DataFrame:
     df = parser.parse_event("cs_win_panel_match")
     team = parser.parse_event("player_team")
@@ -152,7 +148,6 @@ def get_start_info(parser: DemoParser) -> pd.DataFrame:
     return team_name
 
 
-# НЕ ДЕЛАТЬ ЗАВЯЗКУ НА КОЛИЧЕСТВЕ РАУНДОВ ХАРДКОДОМ
 def get_buy_type_by_rounds(parser: DemoParser) -> pd.DataFrame:
 
     def get_buy_type_name(row):
@@ -243,7 +238,6 @@ def get_rounds_count(parser: DemoParser) -> pd.DataFrame:
     return rouns_num
 
 
-# ТУТ ПАДАЕТ НА НОВОЙ ДЕМКЕ И ПРИДУМАТЬ ЧТО_ТО С БИТЫМИ ДЕМКАМИ
 def get_adr(parser: DemoParser) -> pd.DataFrame:
     df = parser.parse_event("player_hurt", other=["total_rounds_played"])
     df = df[df["attacker_steamid"].notna()]
@@ -264,7 +258,7 @@ def get_adr(parser: DemoParser) -> pd.DataFrame:
         df.loc[idx, "was_health"] = ticks[
             (ticks["tick"] == row["tick"] - 1)
             & (ticks["steamid"] == int(row["user_steamid"]))
-        ]["health"].safe_get(row["dmg_health"])
+        ]["health"].get_or_else(row["dmg_health"])
 
     filtred_df = df[df["user_team_name"] != df["attacker_team_name"]]
     filtred_df = filtred_df.rename(
@@ -879,7 +873,7 @@ def get_utility_damage(parser: DemoParser) -> pd.DataFrame:
         util_dmg.loc[idx, "was_health"] = ticks[
             (ticks["tick"] == row["tick"] - 1)
             & (ticks["steamid"] == int(row["user_steamid"]))
-        ]["health"].safe_get(row["dmg_health"])
+        ]["health"].get_or_else(row["dmg_health"])
 
     util_dmg = util_dmg[
         util_dmg["user_team_name"] != util_dmg["attacker_team_name"]
@@ -1016,7 +1010,7 @@ def get_kills_and_damage_by_weapon(parser: DemoParser) -> pd.DataFrame:
                 df.loc[idx, "was_health"] = ticks[
                     (ticks["tick"] == row["tick"] - 1)
                     & (ticks["steamid"] == int(row["user_steamid"]))
-                ]["health"].safe_get(row["dmg_health"])
+                ]["health"].get_or_else(row["dmg_health"])
 
         df = df[df["user_team_name"] != df["attacker_team_name"]]
         return df
@@ -1171,7 +1165,7 @@ def get_weapon_stat(parser: DemoParser) -> tuple[pd.DataFrame, pd.DataFrame]:
             all_fires.loc[idx, "was_health"] = ticks[
                 (ticks["tick"] == row["tick"] - 1)
                 & (ticks["steamid"] == int(row["user_steamid"]))
-            ]["health"].safe_get(row["dmg_health"])
+            ]["health"].get_or_else(row["dmg_health"])
 
     all_fires = all_fires[
         all_fires["user_team_name"] != all_fires["team_name"]
@@ -1255,16 +1249,7 @@ def get_duels(parser: DemoParser) -> pd.DataFrame:
         .size()
         .reset_index(name="open_duels")
     )
-    awp_duels = (
-        deaths[deaths["weapon"] == "awp"]
-        .groupby(["attacker_steamid", "user_steamid"])
-        .size()
-        .reset_index(name="awp_duels")
-        .rename(columns={"user_steamid": "victim_steamid"})
-    )
-    return _merge_many(
-        [duels, first_kills_duels, awp_duels], how="left"
-    ).fillna(0)
+    return merge_many([duels, first_kills_duels], how="left").fillna(0)
 
 
 def get_rounds(parser: DemoParser) -> pd.DataFrame:
@@ -1397,7 +1382,6 @@ def get_kills_in_round(parser: DemoParser) -> pd.DataFrame:
 
 
 def get_stats(parser: DemoParser):
-    """das."""
     scoreboard = []
     scoreboard.append(get_rounds_count(parser))
     scoreboard.append(get_kd(parser))
@@ -1410,7 +1394,7 @@ def get_stats(parser: DemoParser):
     scoreboard.append(get_kast_rounds(parser))
     scoreboard.append(get_multykills(parser))
 
-    result = _merge_many(
+    result = merge_many(
         scoreboard,
         how="left",
         on=[
